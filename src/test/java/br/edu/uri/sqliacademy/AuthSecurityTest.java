@@ -79,6 +79,32 @@ class AuthSecurityTest {
     }
 
     @Test
+    void adminSoParaPerfilAdmin() throws Exception {
+        mvc.perform(get("/admin").with(user("aluno@x.com").roles("ALUNO"))).andExpect(status().isForbidden());
+        mvc.perform(get("/admin/modulos").with(user("aluno@x.com").roles("ALUNO"))).andExpect(status().isForbidden());
+        // Admin passa pela seguranca; 404 porque ainda nao ha controller em /admin
+        mvc.perform(get("/admin").with(user("admin@x.com").roles("ADMIN"))).andExpect(status().isNotFound());
+        mvc.perform(get("/admin")).andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    void rotasLogadasParaQualquerPerfil() throws Exception {
+        // 404 (e nao 403/redirect): passou pela seguranca; a rota ainda nao existe
+        mvc.perform(get("/trilha").with(user("aluno@x.com").roles("ALUNO"))).andExpect(status().isNotFound());
+        mvc.perform(get("/trilha").with(user("admin@x.com").roles("ADMIN"))).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void linkAdminSoParaPerfilAdmin() throws Exception {
+        mvc.perform(get("/").with(user("admin@x.com").roles("ADMIN")))
+                .andExpect(content().string(containsString(">Admin<")));
+        mvc.perform(get("/").with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(content().string(not(containsString(">Admin<"))));
+        mvc.perform(get("/"))
+                .andExpect(content().string(not(containsString(">Admin<"))));
+    }
+
+    @Test
     void paginasPublicas() throws Exception {
         mvc.perform(get("/login")).andExpect(status().isOk());
         mvc.perform(get("/cadastro")).andExpect(status().isOk());

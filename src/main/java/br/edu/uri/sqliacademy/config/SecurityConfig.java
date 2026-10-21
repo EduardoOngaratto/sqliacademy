@@ -17,6 +17,7 @@ public class SecurityConfig {
                         // /error liberado para visitantes verem paginas de erro em vez de ir ao login
                         .requestMatchers("/", "/login", "/cadastro", "/error",
                                 "/css/**", "/js/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<!-- Pagina de erro generica do Spring Boot (404, 500 etc.); o 403 tem pagina propria em error/403.html -->
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Erro · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-5">
+    <div class="p-5 bg-body-tertiary rounded-3 text-center">
+        <h1 class="display-6 fw-bold"
+            th:text="${status == 404} ? 'Página não encontrada' : 'Algo deu errado'">Algo deu errado</h1>
+        <p class="fs-5 mt-3"
+           th:text="${status == 404} ? 'A página que você procurou não existe.' : 'Ocorreu um erro inesperado. Tente novamente mais tarde.'">
+            Ocorreu um erro inesperado.
+        </p>
+        <p class="text-body-secondary small" th:if="${status}" th:text="|Código ${status}|"></p>
+        <a class="btn btn-primary" th:href="@{/}">Página inicial</a>
+    </div>
+</main>
+</body>
+</html>

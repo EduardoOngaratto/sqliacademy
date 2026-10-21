@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>SQLi Academy</title>
+</head>
+<body>
+<main class="container py-5">
+    <div class="p-5 bg-body-tertiary rounded-3">
+        <h1 class="display-5 fw-bold">SQLi Academy</h1>
+        <p class="col-lg-8 fs-5">
+            Aprenda o que é SQL Injection, como identificar código vulnerável e como se proteger,
+            com conteúdos, laboratórios práticos e questionários.
+        </p>
+        <a class="btn btn-primary btn-lg" th:href="@{/trilha}">Começar</a>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="|${progresso.modulo.titulo} · SQLi Academy|">Módulo · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/trilha}">Trilha</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${progresso.modulo.titulo}">Módulo</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <h1 class="h3" th:text="|Módulo ${progresso.modulo.ordem} — ${progresso.modulo.titulo}|">Módulo</h1>
+        <span class="badge"
+              th:classappend="${progresso.status.name() == 'CONCLUIDO'} ? 'text-bg-success'
+                            : (${progresso.status.name() == 'LIBERADO'} ? 'text-bg-primary' : 'text-bg-secondary')"
+              th:text="${progresso.status.rotulo}">Status</span>
+    </div>
+    <p class="text-body-secondary" th:text="${progresso.modulo.descricao}"></p>
+
+    <h2 class="h5 mt-4" th:text="|Conteúdos (${progresso.conteudosLidos} de ${progresso.totalConteudos} lidos)|">Conteúdos</h2>
+    <div class="list-group mb-4">
+        <a th:each="c : ${conteudos}" class="list-group-item list-group-item-action d-flex justify-content-between"
+           th:href="@{/conteudos/{id}(id=${c.id})}">
+            <span th:text="${c.titulo}">Conteúdo</span>
+            <span th:if="${idsConcluidos.contains(c.id)}" class="text-success">✓ Lido</span>
+        </a>
+        <div th:if="${#lists.isEmpty(conteudos)}" class="list-group-item text-body-secondary">
+            Nenhum conteúdo cadastrado.
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Laboratório</h2>
+                    <p class="card-text" th:text="${progresso.labResolvido} ? 'Resolvido' : 'Pendente'">Pendente</p>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Disponível em breve</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h6 card-title">Questionário</h2>
+                    <p class="card-text">
+                        <span th:text="${progresso.questionarioAprovado} ? 'Aprovado' : 'Pendente'">Pendente</span>
+                        <span th:if="${progresso.melhorPercentual != null}"
+                              th:text="|(melhor nota ${progresso.melhorPercentual}%)|"></span>
+                    </p>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Disponível em breve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

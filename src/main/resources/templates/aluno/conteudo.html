@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="|${conteudo.titulo} · SQLi Academy|">Conteúdo · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/trilha}">Trilha</a></li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/modulos/{id}(id=${conteudo.modulo.id})}" th:text="${conteudo.modulo.titulo}">Módulo</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${conteudo.titulo}">Conteúdo</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0" th:text="${conteudo.titulo}">Conteúdo</h1>
+        <span th:if="${concluido}" class="badge text-bg-success">Concluído</span>
+    </div>
+
+    <!-- HTML cadastrado pelo admin (confiavel). Codigo em <pre><code class="language-sql|language-java"> -->
+    <article class="mb-4" th:utext="${conteudo.corpo}"></article>
+
+    <div class="d-flex flex-wrap gap-2 border-top pt-3">
+        <form method="post" th:action="@{/conteudos/{id}/concluir(id=${conteudo.id})}">
+            <button type="submit" class="btn btn-success" th:disabled="${concluido}"
+                    th:text="${concluido} ? 'Concluído ✓' : 'Marcar como concluído'">Marcar como concluído</button>
+        </form>
+        <a class="btn btn-outline-secondary" th:href="@{/modulos/{id}(id=${conteudo.modulo.id})}">Voltar ao módulo</a>
+        <a th:if="${proximo}" class="btn btn-primary" th:href="@{/conteudos/{id}(id=${proximo.id})}">Próximo conteúdo</a>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Trilha · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <h1 class="h3 mb-4">Trilha de aprendizagem</h1>
+
+    <div th:if="${aviso}" class="alert alert-warning" th:text="${aviso}"></div>
+
+    <div class="row g-3">
+        <div class="col-12" th:each="p : ${trilha}">
+            <div class="card" th:classappend="${p.status.name() == 'BLOQUEADO'} ? 'opacity-75'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <h2 class="h5 card-title mb-1"
+                            th:text="|Módulo ${p.modulo.ordem} — ${p.modulo.titulo}|">Módulo</h2>
+                        <span class="badge"
+                              th:classappend="${p.status.name() == 'CONCLUIDO'} ? 'text-bg-success'
+                                            : (${p.status.name() == 'LIBERADO'} ? 'text-bg-primary' : 'text-bg-secondary')"
+                              th:text="${p.status.rotulo}">Status</span>
+                    </div>
+                    <p class="card-text text-body-secondary" th:text="${p.modulo.descricao}"></p>
+
+                    <ul class="list-unstyled small mb-3">
+                        <li th:text="|Conteúdos lidos: ${p.conteudosLidos} de ${p.totalConteudos}|"></li>
+                        <li th:text="|Laboratório: ${p.labResolvido ? 'resolvido' : 'pendente'}|"></li>
+                        <li th:if="${p.questionarioAprovado}"
+                            th:text="|Questionário: aprovado (melhor nota ${p.melhorPercentual}%)|"></li>
+                        <li th:if="${!p.questionarioAprovado and p.melhorPercentual != null}"
+                            th:text="|Questionário: pendente (melhor nota ${p.melhorPercentual}%)|"></li>
+                        <li th:if="${p.melhorPercentual == null}">Questionário: pendente</li>
+                    </ul>
+
+                    <a th:if="${admin or p.status.name() != 'BLOQUEADO'}" class="btn btn-primary btn-sm"
+                       th:href="@{/modulos/{id}(id=${p.modulo.id})}">Acessar</a>
+                    <span th:unless="${admin or p.status.name() != 'BLOQUEADO'}" class="text-body-secondary small">
+                        Conclua o módulo anterior para liberar.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

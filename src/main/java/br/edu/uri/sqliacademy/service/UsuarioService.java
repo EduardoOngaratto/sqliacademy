@@ -23,6 +23,11 @@ public class UsuarioService {
         return usuarioRepository.existsByEmail(email);
     }
 
+    // Usuario logado: o "username" da autenticacao e o e-mail
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email).orElseThrow();
+    }
+
     // O e-mail ja chega normalizado pelo CadastroForm
     @Transactional
     public Usuario cadastrarAluno(CadastroForm form) {

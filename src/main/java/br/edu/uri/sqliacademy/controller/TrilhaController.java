@@ -1,9 +1,11 @@
 package br.edu.uri.sqliacademy.controller;
 
+import br.edu.uri.sqliacademy.entity.Laboratorio;
 import br.edu.uri.sqliacademy.entity.Modulo;
 import br.edu.uri.sqliacademy.entity.Perfil;
 import br.edu.uri.sqliacademy.entity.Usuario;
 import br.edu.uri.sqliacademy.service.ConteudoService;
+import br.edu.uri.sqliacademy.service.LaboratorioService;
 import br.edu.uri.sqliacademy.service.ProgressoService;
 import br.edu.uri.sqliacademy.service.UsuarioService;
 import org.springframework.security.core.Authentication;
@@ -21,12 +23,14 @@ public class TrilhaController {
     private final UsuarioService usuarioService;
     private final ProgressoService progressoService;
     private final ConteudoService conteudoService;
+    private final LaboratorioService laboratorioService;
 
     public TrilhaController(UsuarioService usuarioService, ProgressoService progressoService,
-                            ConteudoService conteudoService) {
+                            ConteudoService conteudoService, LaboratorioService laboratorioService) {
         this.usuarioService = usuarioService;
         this.progressoService = progressoService;
         this.conteudoService = conteudoService;
+        this.laboratorioService = laboratorioService;
     }
 
     @GetMapping("/trilha")
@@ -52,6 +56,9 @@ public class TrilhaController {
         model.addAttribute("progresso", progressoService.calcularModulo(usuario, modulo));
         model.addAttribute("conteudos", conteudoService.listarPorModulo(modulo));
         model.addAttribute("idsConcluidos", conteudoService.idsConcluidos(usuario, modulo));
+        Laboratorio laboratorio = laboratorioService.buscarDoModulo(modulo);
+        model.addAttribute("laboratorio", laboratorio);
+        model.addAttribute("labDisponivel", laboratorioService.disponivel(laboratorio));
         return "aluno/modulo";
     }
 }

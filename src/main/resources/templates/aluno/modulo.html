@@ -38,9 +38,13 @@
         <div class="col-md-6">
             <div class="card h-100">
                 <div class="card-body">
-                    <h2 class="h6 card-title">Laboratório</h2>
+                    <h2 class="h6 card-title"
+                        th:text="${laboratorio != null} ? |Laboratório: ${laboratorio.titulo}| : 'Laboratório'">Laboratório</h2>
                     <p class="card-text" th:text="${progresso.labResolvido} ? 'Resolvido' : 'Pendente'">Pendente</p>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Disponível em breve</button>
+                    <a th:if="${labDisponivel}" class="btn btn-primary btn-sm"
+                       th:href="@{/laboratorios/{codigo}(codigo=${laboratorio.codigo})}">Acessar</a>
+                    <button th:unless="${labDisponivel}" type="button" class="btn btn-outline-secondary btn-sm"
+                            disabled>Disponível em breve</button>
                 </div>
             </div>
         </div>

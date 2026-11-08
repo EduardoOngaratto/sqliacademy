@@ -6,10 +6,12 @@ import br.edu.uri.sqliacademy.controller.TrilhaController;
 import br.edu.uri.sqliacademy.dto.ProgressoModulo;
 import br.edu.uri.sqliacademy.dto.StatusModulo;
 import br.edu.uri.sqliacademy.entity.Conteudo;
+import br.edu.uri.sqliacademy.entity.Laboratorio;
 import br.edu.uri.sqliacademy.entity.Modulo;
 import br.edu.uri.sqliacademy.entity.Perfil;
 import br.edu.uri.sqliacademy.entity.Usuario;
 import br.edu.uri.sqliacademy.service.ConteudoService;
+import br.edu.uri.sqliacademy.service.LaboratorioService;
 import br.edu.uri.sqliacademy.service.ProgressoService;
 import br.edu.uri.sqliacademy.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +54,7 @@ class TrilhaConteudoTest {
     @MockitoBean UsuarioService usuarioService;
     @MockitoBean ProgressoService progressoService;
     @MockitoBean ConteudoService conteudoService;
+    @MockitoBean LaboratorioService laboratorioService;
     @MockitoBean UserDetailsService userDetailsService;
 
     private final Usuario aluno = new Usuario("Aluno", "aluno@x.com", "hash", Perfil.ALUNO);
@@ -113,6 +116,23 @@ class TrilhaConteudoTest {
                 .andExpect(content().string(containsString("href=\"/conteudos/10\"")))
                 .andExpect(content().string(containsString("✓ Lido")))
                 .andExpect(content().string(containsString("Disponível em breve")));
+    }
+
+    @Test
+    void moduloComLabDisponivelMostraAcessarEResolvido() throws Exception {
+        Laboratorio lab = new Laboratorio(m1, "LAB1", "Burlando um login", "Enunciado", null, 100);
+        when(progressoService.calcularModulo(aluno, m1))
+                .thenReturn(new ProgressoModulo(m1, 2, 2, true, null, false, StatusModulo.LIBERADO));
+        when(conteudoService.listarPorModulo(m1)).thenReturn(List.of(c1, c2));
+        when(conteudoService.idsConcluidos(aluno, m1)).thenReturn(Set.of(10L, 11L));
+        when(laboratorioService.buscarDoModulo(m1)).thenReturn(lab);
+        when(laboratorioService.disponivel(lab)).thenReturn(true);
+
+        mvc.perform(get("/modulos/1").with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Laboratório: Burlando um login")))
+                .andExpect(content().string(containsString("Resolvido")))
+                .andExpect(content().string(containsString("href=\"/laboratorios/LAB1\"")));
     }
 
     @Test

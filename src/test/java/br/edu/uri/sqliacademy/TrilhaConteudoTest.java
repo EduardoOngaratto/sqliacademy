@@ -88,8 +88,8 @@ class TrilhaConteudoTest {
     @Test
     void trilhaMostraModulosComStatusEProgresso() throws Exception {
         when(progressoService.calcularTrilha(aluno)).thenReturn(List.of(
-                new ProgressoModulo(m1, 2, 1, false, 50, false, StatusModulo.LIBERADO),
-                new ProgressoModulo(m2, 1, 0, false, null, false, StatusModulo.BLOQUEADO)));
+                new ProgressoModulo(m1, 2, 1, false, StatusModulo.LIBERADO),
+                new ProgressoModulo(m2, 1, 0, false, StatusModulo.BLOQUEADO)));
 
         mvc.perform(get("/trilha").with(user("aluno@x.com").roles("ALUNO")))
                 .andExpect(status().isOk())
@@ -98,7 +98,8 @@ class TrilhaConteudoTest {
                 .andExpect(content().string(containsString(">Liberado<")))
                 .andExpect(content().string(containsString(">Bloqueado<")))
                 .andExpect(content().string(containsString("Conteúdos lidos: 1 de 2")))
-                .andExpect(content().string(containsString("Questionário: pendente (melhor nota 50%)")))
+                .andExpect(content().string(containsString("Laboratório: pendente")))
+                .andExpect(content().string(not(containsString("Questionário"))))
                 .andExpect(content().string(containsString("href=\"/modulos/1\"")))
                 .andExpect(content().string(not(containsString("href=\"/modulos/2\""))));
     }
@@ -106,7 +107,7 @@ class TrilhaConteudoTest {
     @Test
     void moduloLiberadoMostraConteudosComLidos() throws Exception {
         when(progressoService.calcularModulo(aluno, m1))
-                .thenReturn(new ProgressoModulo(m1, 2, 1, false, null, false, StatusModulo.LIBERADO));
+                .thenReturn(new ProgressoModulo(m1, 2, 1, false, StatusModulo.LIBERADO));
         when(conteudoService.listarPorModulo(m1)).thenReturn(List.of(c1, c2));
         when(conteudoService.idsConcluidos(aluno, m1)).thenReturn(Set.of(10L));
 
@@ -115,14 +116,15 @@ class TrilhaConteudoTest {
                 .andExpect(content().string(containsString("Conteúdos (1 de 2 lidos)")))
                 .andExpect(content().string(containsString("href=\"/conteudos/10\"")))
                 .andExpect(content().string(containsString("✓ Lido")))
-                .andExpect(content().string(containsString("Disponível em breve")));
+                .andExpect(content().string(containsString("Disponível em breve")))
+                .andExpect(content().string(not(containsString("Questionário"))));
     }
 
     @Test
     void moduloComLabDisponivelMostraAcessarEResolvido() throws Exception {
         Laboratorio lab = new Laboratorio(m1, "LAB1", "Burlando um login", "Enunciado", null, 100);
         when(progressoService.calcularModulo(aluno, m1))
-                .thenReturn(new ProgressoModulo(m1, 2, 2, true, null, false, StatusModulo.LIBERADO));
+                .thenReturn(new ProgressoModulo(m1, 2, 2, true, StatusModulo.LIBERADO));
         when(conteudoService.listarPorModulo(m1)).thenReturn(List.of(c1, c2));
         when(conteudoService.idsConcluidos(aluno, m1)).thenReturn(Set.of(10L, 11L));
         when(laboratorioService.buscarDoModulo(m1)).thenReturn(lab);

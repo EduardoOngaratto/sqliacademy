@@ -2,10 +2,8 @@ package br.edu.uri.sqliacademy.config;
 
 import br.edu.uri.sqliacademy.entity.Conteudo;
 import br.edu.uri.sqliacademy.entity.Modulo;
-import br.edu.uri.sqliacademy.entity.Questao;
 import br.edu.uri.sqliacademy.repository.ConteudoRepository;
 import br.edu.uri.sqliacademy.repository.ProgressoConteudoRepository;
-import br.edu.uri.sqliacademy.repository.QuestaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,13 +21,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-// Carga de conteudos e questoes a partir dos arquivos de src/test/resources/conteudos (modulo 9)
+// Carga de conteudos a partir dos arquivos de src/test/resources/conteudos (modulo 9)
 class CargaConteudoTest {
 
     private final ConteudoRepository conteudoRepository = mock(ConteudoRepository.class);
     private final ProgressoConteudoRepository progressoConteudoRepository = mock(ProgressoConteudoRepository.class);
-    private final QuestaoRepository questaoRepository = mock(QuestaoRepository.class);
-    private final CargaConteudo carga = new CargaConteudo(conteudoRepository, progressoConteudoRepository, questaoRepository);
+    private final CargaConteudo carga = new CargaConteudo(conteudoRepository, progressoConteudoRepository);
 
     private Modulo modulo9;
     private Modulo modulo8;
@@ -89,31 +86,5 @@ class CargaConteudoTest {
 
         verify(conteudoRepository, never()).save(any());
         verify(conteudoRepository, never()).delete(any());
-    }
-
-    @Test
-    void criaQuestoesValidasDoModuloEIgnoraAsInvalidas() {
-        when(questaoRepository.existsByModulo(modulo9)).thenReturn(false);
-
-        carga.carregarQuestoes(List.of(modulo9));
-
-        ArgumentCaptor<Questao> captor = ArgumentCaptor.forClass(Questao.class);
-        verify(questaoRepository, times(2)).save(captor.capture());
-        Questao primeira = captor.getAllValues().get(0);
-        assertEquals("Questão válida 1?", primeira.getEnunciado());
-        assertEquals("Explicação 1.", primeira.getExplicacao());
-        assertEquals(4, primeira.getAlternativas().size());
-        assertTrue(primeira.getAlternativas().get(1).isCorreta());
-        assertEquals(primeira, primeira.getAlternativas().get(0).getQuestao());
-        assertEquals("Questão válida 2?", captor.getAllValues().get(1).getEnunciado());
-    }
-
-    @Test
-    void naoMexeEmModuloQueJaTemQuestoes() {
-        when(questaoRepository.existsByModulo(modulo9)).thenReturn(true);
-
-        carga.carregarQuestoes(List.of(modulo9));
-
-        verify(questaoRepository, never()).save(any());
     }
 }

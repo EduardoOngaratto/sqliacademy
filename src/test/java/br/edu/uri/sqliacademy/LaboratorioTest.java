@@ -322,6 +322,6 @@ class LaboratorioTest {
     }
 
     private ProgressoModulo progresso(int conteudosLidos, boolean labResolvido) {
-        return new ProgressoModulo(m1, 1, conteudosLidos, labResolvido, null, false, StatusModulo.LIBERADO);
+        return new ProgressoModulo(m1, 1, conteudosLidos, labResolvido, StatusModulo.LIBERADO);
     }
 }

@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -181,8 +180,6 @@ public class CargaInicial implements ApplicationRunner {
                         + "que realmente impede o SQL Injection. Depois, repita o ataque do Lab 1 contra ela.",
                 EXPLICACAO_LAB3);
         criarConteudoProvisorio(prevencao);
-
-        cargaConteudo.carregarQuestoes(List.of(introducao, identificacao, prevencao));
     }
 
     private void criarAdmin() {

@@ -7,23 +7,21 @@ import br.edu.uri.sqliacademy.entity.Modulo;
  */
 public class ProgressoModulo {
 
+    // Escala de pontuacao do CLAUDE.md: 100 pontos por laboratorio resolvido
+    public static final int PONTOS_LABORATORIO = 100;
+
     private final Modulo modulo;
     private final long totalConteudos;
     private final long conteudosLidos;
     private final boolean labResolvido;
-    // null quando o aluno ainda nao fez o questionario
-    private final Integer melhorPercentual;
-    private final boolean questionarioAprovado;
     private final StatusModulo status;
 
     public ProgressoModulo(Modulo modulo, long totalConteudos, long conteudosLidos, boolean labResolvido,
-                           Integer melhorPercentual, boolean questionarioAprovado, StatusModulo status) {
+                           StatusModulo status) {
         this.modulo = modulo;
         this.totalConteudos = totalConteudos;
         this.conteudosLidos = conteudosLidos;
         this.labResolvido = labResolvido;
-        this.melhorPercentual = melhorPercentual;
-        this.questionarioAprovado = questionarioAprovado;
         this.status = status;
     }
 
@@ -43,15 +41,11 @@ public class ProgressoModulo {
         return labResolvido;
     }
 
-    public Integer getMelhorPercentual() {
-        return melhorPercentual;
-    }
-
-    public boolean isQuestionarioAprovado() {
-        return questionarioAprovado;
-    }
-
     public StatusModulo getStatus() {
         return status;
+    }
+
+    public int getPontos() {
+        return labResolvido ? PONTOS_LABORATORIO : 0;
     }
 }

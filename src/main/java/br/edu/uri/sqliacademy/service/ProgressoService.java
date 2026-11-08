@@ -4,22 +4,19 @@ import br.edu.uri.sqliacademy.dto.ProgressoModulo;
 import br.edu.uri.sqliacademy.dto.StatusModulo;
 import br.edu.uri.sqliacademy.entity.Modulo;
 import br.edu.uri.sqliacademy.entity.Perfil;
-import br.edu.uri.sqliacademy.entity.TentativaQuestionario;
 import br.edu.uri.sqliacademy.entity.Usuario;
 import br.edu.uri.sqliacademy.repository.ConteudoRepository;
 import br.edu.uri.sqliacademy.repository.ModuloRepository;
 import br.edu.uri.sqliacademy.repository.ProgressoConteudoRepository;
 import br.edu.uri.sqliacademy.repository.TentativaLaboratorioRepository;
-import br.edu.uri.sqliacademy.repository.TentativaQuestionarioRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Calcula status e progresso dos modulos (regras do CLAUDE.md).
- * Modulo concluido = liberado + todos os conteudos lidos + lab resolvido + questionario aprovado.
+ * Calcula status, progresso e pontuacao dos modulos (regras do CLAUDE.md).
+ * Modulo concluido = liberado + todos os conteudos lidos + lab resolvido.
  * Modulo liberado = primeiro da trilha ou anterior concluido.
  */
 @Service
@@ -29,21 +26,15 @@ public class ProgressoService {
     private final ConteudoRepository conteudoRepository;
     private final ProgressoConteudoRepository progressoConteudoRepository;
     private final TentativaLaboratorioRepository tentativaLaboratorioRepository;
-    private final TentativaQuestionarioRepository tentativaQuestionarioRepository;
-    private final int notaMinima;
 
     public ProgressoService(ModuloRepository moduloRepository,
                             ConteudoRepository conteudoRepository,
                             ProgressoConteudoRepository progressoConteudoRepository,
-                            TentativaLaboratorioRepository tentativaLaboratorioRepository,
-                            TentativaQuestionarioRepository tentativaQuestionarioRepository,
-                            @Value("${sqliacademy.nota-minima}") int notaMinima) {
+                            TentativaLaboratorioRepository tentativaLaboratorioRepository) {
         this.moduloRepository = moduloRepository;
         this.conteudoRepository = conteudoRepository;
         this.progressoConteudoRepository = progressoConteudoRepository;
         this.tentativaLaboratorioRepository = tentativaLaboratorioRepository;
-        this.tentativaQuestionarioRepository = tentativaQuestionarioRepository;
-        this.notaMinima = notaMinima;
     }
 
     public List<ProgressoModulo> calcularTrilha(Usuario usuario) {
@@ -56,11 +47,7 @@ public class ProgressoService {
             boolean labResolvido = tentativaLaboratorioRepository
                     .existsByUsuarioAndLaboratorioModuloAndSucessoTrue(usuario, modulo);
 
-            List<TentativaQuestionario> tentativas = tentativaQuestionarioRepository.findByUsuarioAndModulo(usuario, modulo);
-            Integer melhorPercentual = melhorPercentual(tentativas);
-            boolean questionarioAprovado = tentativas.stream().anyMatch(this::aprovada);
-
-            boolean completo = conteudosLidos >= totalConteudos && labResolvido && questionarioAprovado;
+            boolean completo = conteudosLidos >= totalConteudos && labResolvido;
             StatusModulo status;
             if (!anteriorConcluido) {
                 status = StatusModulo.BLOQUEADO;
@@ -70,8 +57,7 @@ public class ProgressoService {
                 status = StatusModulo.LIBERADO;
             }
 
-            trilha.add(new ProgressoModulo(modulo, totalConteudos, conteudosLidos, labResolvido,
-                    melhorPercentual, questionarioAprovado, status));
+            trilha.add(new ProgressoModulo(modulo, totalConteudos, conteudosLidos, labResolvido, status));
             anteriorConcluido = status == StatusModulo.CONCLUIDO;
         }
         return trilha;
@@ -91,23 +77,12 @@ public class ProgressoService {
                 || calcularModulo(usuario, modulo).getStatus() != StatusModulo.BLOQUEADO;
     }
 
-    // Comparacao em inteiros, sem divisao: acertos/total >= notaMinima/100
-    private boolean aprovada(TentativaQuestionario tentativa) {
-        return tentativa.getTotal() > 0
-                && tentativa.getAcertos() * 100 >= notaMinima * tentativa.getTotal();
+    // Pontuacao = pontos dos labs resolvidos (calculada, nao armazenada)
+    public int pontuacao(List<ProgressoModulo> trilha) {
+        return trilha.stream().mapToInt(ProgressoModulo::getPontos).sum();
     }
 
-    // Melhor nota pelo percentual (o total de questoes pode variar entre tentativas)
-    private Integer melhorPercentual(List<TentativaQuestionario> tentativas) {
-        Integer melhor = null;
-        for (TentativaQuestionario t : tentativas) {
-            if (t.getTotal() > 0) {
-                int percentual = t.getAcertos() * 100 / t.getTotal();
-                if (melhor == null || percentual > melhor) {
-                    melhor = percentual;
-                }
-            }
-        }
-        return melhor;
+    public int pontuacaoMaxima(List<ProgressoModulo> trilha) {
+        return trilha.size() * ProgressoModulo.PONTOS_LABORATORIO;
     }
 }

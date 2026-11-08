@@ -35,7 +35,7 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-md-6">
+        <div class="col-12">
             <div class="card h-100">
                 <div class="card-body">
                     <h2 class="h6 card-title"
@@ -45,19 +45,6 @@
                        th:href="@{/laboratorios/{codigo}(codigo=${laboratorio.codigo})}">Acessar</a>
                     <button th:unless="${labDisponivel}" type="button" class="btn btn-outline-secondary btn-sm"
                             disabled>Disponível em breve</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h2 class="h6 card-title">Questionário</h2>
-                    <p class="card-text">
-                        <span th:text="${progresso.questionarioAprovado} ? 'Aprovado' : 'Pendente'">Pendente</span>
-                        <span th:if="${progresso.melhorPercentual != null}"
-                              th:text="|(melhor nota ${progresso.melhorPercentual}%)|"></span>
-                    </p>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Disponível em breve</button>
                 </div>
             </div>
         </div>

@@ -27,11 +27,6 @@
                     <ul class="list-unstyled small mb-3">
                         <li th:text="|Conteúdos lidos: ${p.conteudosLidos} de ${p.totalConteudos}|"></li>
                         <li th:text="|Laboratório: ${p.labResolvido ? 'resolvido' : 'pendente'}|"></li>
-                        <li th:if="${p.questionarioAprovado}"
-                            th:text="|Questionário: aprovado (melhor nota ${p.melhorPercentual}%)|"></li>
-                        <li th:if="${!p.questionarioAprovado and p.melhorPercentual != null}"
-                            th:text="|Questionário: pendente (melhor nota ${p.melhorPercentual}%)|"></li>
-                        <li th:if="${p.melhorPercentual == null}">Questionário: pendente</li>
                     </ul>
 
                     <a th:if="${admin or p.status.name() != 'BLOQUEADO'}" class="btn btn-primary btn-sm"

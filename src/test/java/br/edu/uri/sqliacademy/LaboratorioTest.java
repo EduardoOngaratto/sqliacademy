@@ -12,6 +12,7 @@ import br.edu.uri.sqliacademy.entity.Usuario;
 import br.edu.uri.sqliacademy.lab.DetalheCampo;
 import br.edu.uri.sqliacademy.lab.Lab1Validador;
 import br.edu.uri.sqliacademy.lab.Lab2Validador;
+import br.edu.uri.sqliacademy.lab.Lab3Validador;
 import br.edu.uri.sqliacademy.lab.ResultadoValidacao;
 import br.edu.uri.sqliacademy.repository.LaboratorioRepository;
 import br.edu.uri.sqliacademy.repository.TentativaLaboratorioRepository;
@@ -53,7 +54,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // Testes funcionais do Lab 1 (camada web + LaboratorioService e Lab1Validador reais, repositories simulados)
 @WebMvcTest(controllers = LaboratorioController.class)
-@Import({SecurityConfig.class, LaboratorioService.class, Lab1Validador.class, Lab2Validador.class})
+@Import({SecurityConfig.class, LaboratorioService.class, Lab1Validador.class, Lab2Validador.class,
+        Lab3Validador.class})
 class LaboratorioTest {
 
     private static final String XSS = "<script>alert(1)</script>";
@@ -106,7 +108,7 @@ class LaboratorioTest {
 
     @Test
     void labSemValidadorOuInexistenteDa404() throws Exception {
-        mvc.perform(get("/laboratorios/LAB3").with(user("aluno@x.com").roles("ALUNO")))
+        mvc.perform(get("/laboratorios/LAB9").with(user("aluno@x.com").roles("ALUNO")))
                 .andExpect(status().isNotFound());
         mvc.perform(get("/laboratorios/XYZ").with(user("aluno@x.com").roles("ALUNO")))
                 .andExpect(status().isNotFound());
@@ -258,6 +260,52 @@ class LaboratorioTest {
     }
 
     @Test
+    void lab3MostraOriginalEVersoesSemADemonstracaoAntesDeResolver() throws Exception {
+        usarLab3();
+
+        mvc.perform(get("/laboratorios/LAB3").with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Código vulnerável (o login do Lab 1)")))
+                .andExpect(content().string(containsString("name=\"versao\" required")))
+                .andExpect(content().string(containsString("value=\"A\"")))
+                .andExpect(content().string(containsString("value=\"D\"")))
+                .andExpect(content().string(containsString("No navegador (JavaScript):")))
+                .andExpect(content().string(containsString("String.format(")))
+                .andExpect(content().string(containsString("Mostrar dica (0 de 3)")))
+                .andExpect(content().string(containsString("/js/lab3.js")))
+                .andExpect(content().string(not(containsString("id=\"demonstracao\""))));
+    }
+
+    @Test
+    void lab3AcertoGravaTentativa() throws Exception {
+        usarLab3();
+
+        mvc.perform(post("/laboratorios/LAB3").param("versao", "C")
+                        .with(csrf()).with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(redirectedUrl("/laboratorios/LAB3"));
+
+        ArgumentCaptor<TentativaLaboratorio> captor = ArgumentCaptor.forClass(TentativaLaboratorio.class);
+        verify(tentativaLaboratorioRepository).save(captor.capture());
+        assertTrue(captor.getValue().isSucesso());
+        assertEquals("versao: C", captor.getValue().getEntrada());
+    }
+
+    @Test
+    void lab3ResolvidoMostraDemonstracaoEMantemEscolha() throws Exception {
+        usarLab3();
+        when(progressoService.calcularModulo(aluno, m1)).thenReturn(progresso(1, true));
+
+        mvc.perform(get("/laboratorios/LAB3").with(user("aluno@x.com").roles("ALUNO"))
+                        .flashAttr("campos", Map.of("versao", "C"))
+                        .flashAttr("resultado", new ResultadoValidacao(true, null, "Correto!")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("value=\"C\" checked=\"checked\"")))
+                .andExpect(content().string(containsString("id=\"demonstracao\"")))
+                .andExpect(content().string(containsString("Repita o ataque do Lab 1 contra a versão segura")))
+                .andExpect(content().string(containsString("id=\"demo-param1\"")));
+    }
+
+    @Test
     void labExigeLogin() throws Exception {
         mvc.perform(get("/laboratorios/LAB1")).andExpect(redirectedUrl("/login"));
     }
@@ -265,6 +313,12 @@ class LaboratorioTest {
     private void usarLab2() {
         Laboratorio lab2 = new Laboratorio(m1, "LAB2", "Encontre a linha vulnerável", "Enunciado do lab 2", null, 100);
         when(laboratorioRepository.findByCodigo("LAB2")).thenReturn(Optional.of(lab2));
+    }
+
+    private void usarLab3() {
+        Laboratorio lab3 = new Laboratorio(m1, "LAB3", "Código vulnerável x código seguro", "Enunciado do lab 3",
+                null, 100);
+        when(laboratorioRepository.findByCodigo("LAB3")).thenReturn(Optional.of(lab3));
     }
 
     private ProgressoModulo progresso(int conteudosLidos, boolean labResolvido) {

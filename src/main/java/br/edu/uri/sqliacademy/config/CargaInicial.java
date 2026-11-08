@@ -94,6 +94,32 @@ public class CargaInicial implements ApplicationRunner {
             SQL com entrada do usuário é vulnerável; montar o valor de um parâmetro do PreparedStatement não é.</p>
             """;
 
+    // Exibida ao resolver o Lab 3 (HTML confiavel, renderizado com th:utext)
+    private static final String EXPLICACAO_LAB3 = """
+            <h3 class="h6">Por que só a versão C é segura</h3>
+            <p>Com <code>PreparedStatement</code>, o texto do SQL vai para o banco com marcadores <code>?</code>, e os
+            valores são enviados separados. O banco já sabe qual é a estrutura da consulta antes de receber os
+            valores, então a entrada é sempre tratada como dado: aspas, traços e <code>OR</code> viram só caracteres.</p>
+            <h3 class="h6">As armadilhas</h3>
+            <ul>
+                <li><strong>A — String.format:</strong> continua sendo concatenação. O <code>%s</code> é substituído
+                pelo texto digitado antes de a consulta ir ao banco.</li>
+                <li><strong>B — replace manual de aspas:</strong> frágil. No MySQL, a barra invertida também escapa
+                caracteres; campos numéricos não usam aspas; e basta esquecer um campo. Cada banco tem regras
+                próprias de escape, e o driver já as conhece.</li>
+                <li><strong>D — validação só no JavaScript:</strong> o navegador está nas mãos do atacante. Ele
+                desativa o JavaScript ou envia a requisição direto, e o servidor continua concatenando.</li>
+            </ul>
+            <h3 class="h6">Boas práticas complementares</h3>
+            <ul>
+                <li>Validar a entrada também no servidor (tamanho, formato), como complemento, e não como substituto
+                do PreparedStatement.</li>
+                <li>Usar frameworks que parametrizam por padrão, como o JPA/Hibernate usado nesta plataforma.</li>
+                <li>Dar ao usuário do banco da aplicação só as permissões necessárias, para limitar o estrago caso
+                alguma falha passe.</li>
+            </ul>
+            """;
+
     private final UsuarioRepository usuarioRepository;
     private final ModuloRepository moduloRepository;
     private final LaboratorioRepository laboratorioRepository;
@@ -146,9 +172,9 @@ public class CargaInicial implements ApplicationRunner {
         Modulo prevencao = criarModulo(3, "Prevenção",
                 "Como escrever consultas seguras com PreparedStatement e outras boas práticas.");
         criarLaboratorio(prevencao, "LAB3", "Código vulnerável x código seguro",
-                "Compare uma implementação vulnerável com outra que usa PreparedStatement "
-                        + "e identifique qual delas impede o SQL Injection e por quê.",
-                null);
+                "O login do Lab 1 é vulnerável. Entre as quatro versões \"corrigidas\" abaixo, escolha a única "
+                        + "que realmente impede o SQL Injection. Depois, repita o ataque do Lab 1 contra ela.",
+                EXPLICACAO_LAB3);
         criarConteudoProvisorio(prevencao);
     }
 

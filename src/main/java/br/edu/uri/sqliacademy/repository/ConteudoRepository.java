@@ -5,6 +5,7 @@ import br.edu.uri.sqliacademy.entity.Modulo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ConteudoRepository extends JpaRepository<Conteudo, Long> {
 
@@ -13,4 +14,6 @@ public interface ConteudoRepository extends JpaRepository<Conteudo, Long> {
     long countByModulo(Modulo modulo);
 
     List<Conteudo> findByModuloOrderByOrdemAsc(Modulo modulo);
+
+    Optional<Conteudo> findByModuloAndOrdem(Modulo modulo, Integer ordem);
 }

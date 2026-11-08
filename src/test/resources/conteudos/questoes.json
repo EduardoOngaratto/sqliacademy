@@ -1,0 +1,40 @@
+[
+  {
+    "modulo": 9,
+    "enunciado": "Questão válida 1?",
+    "explicacao": "Explicação 1.",
+    "alternativas": [
+      {"texto": "A", "correta": false},
+      {"texto": "B", "correta": true},
+      {"texto": "C", "correta": false},
+      {"texto": "D", "correta": false}
+    ]
+  },
+  {
+    "modulo": 9,
+    "enunciado": "Questão inválida (duas corretas)?",
+    "explicacao": "Não deve ser carregada.",
+    "alternativas": [
+      {"texto": "A", "correta": true},
+      {"texto": "B", "correta": true}
+    ]
+  },
+  {
+    "modulo": 9,
+    "enunciado": "Questão válida 2?",
+    "explicacao": "Explicação 2.",
+    "alternativas": [
+      {"texto": "A", "correta": true},
+      {"texto": "B", "correta": false}
+    ]
+  },
+  {
+    "modulo": 8,
+    "enunciado": "Questão de outro módulo?",
+    "explicacao": "Explicação.",
+    "alternativas": [
+      {"texto": "A", "correta": true},
+      {"texto": "B", "correta": false}
+    ]
+  }
+]

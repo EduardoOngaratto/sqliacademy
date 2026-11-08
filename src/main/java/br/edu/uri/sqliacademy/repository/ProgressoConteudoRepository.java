@@ -15,4 +15,7 @@ public interface ProgressoConteudoRepository extends JpaRepository<ProgressoCont
     List<ProgressoConteudo> findByUsuarioAndConteudoModulo(Usuario usuario, Modulo modulo);
 
     boolean existsByUsuarioAndConteudo(Usuario usuario, Conteudo conteudo);
+
+    // Usado pela carga inicial antes de apagar um conteudo (FK de progresso_conteudo)
+    void deleteByConteudo(Conteudo conteudo);
 }

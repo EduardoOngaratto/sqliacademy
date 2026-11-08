@@ -18,13 +18,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 /**
  * Carga inicial de dados, executada a cada inicializacao.
  * Idempotente: so cria o que ainda nao existe e nao altera registros existentes
- * (unica excecao: preencher a explicacao de um laboratorio que ainda esteja vazia).
+ * (excecoes: preencher a explicacao de um laboratorio que ainda esteja vazia, e os conteudos,
+ * que seguem os arquivos de resources/conteudos - ver CargaConteudo).
  */
 @Component
 public class CargaInicial implements ApplicationRunner {
@@ -125,6 +127,7 @@ public class CargaInicial implements ApplicationRunner {
     private final LaboratorioRepository laboratorioRepository;
     private final ConteudoRepository conteudoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CargaConteudo cargaConteudo;
     private final String adminNome;
     private final String adminEmail;
     private final String adminSenha;
@@ -134,6 +137,7 @@ public class CargaInicial implements ApplicationRunner {
                         LaboratorioRepository laboratorioRepository,
                         ConteudoRepository conteudoRepository,
                         PasswordEncoder passwordEncoder,
+                        CargaConteudo cargaConteudo,
                         @Value("${sqliacademy.admin.nome}") String adminNome,
                         @Value("${sqliacademy.admin.email}") String adminEmail,
                         @Value("${sqliacademy.admin.senha}") String adminSenha) {
@@ -142,6 +146,7 @@ public class CargaInicial implements ApplicationRunner {
         this.laboratorioRepository = laboratorioRepository;
         this.conteudoRepository = conteudoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cargaConteudo = cargaConteudo;
         this.adminNome = adminNome;
         this.adminEmail = adminEmail.trim().toLowerCase(Locale.ROOT);
         this.adminSenha = adminSenha;
@@ -176,6 +181,8 @@ public class CargaInicial implements ApplicationRunner {
                         + "que realmente impede o SQL Injection. Depois, repita o ataque do Lab 1 contra ela.",
                 EXPLICACAO_LAB3);
         criarConteudoProvisorio(prevencao);
+
+        cargaConteudo.carregarQuestoes(List.of(introducao, identificacao, prevencao));
     }
 
     private void criarAdmin() {
@@ -216,12 +223,13 @@ public class CargaInicial implements ApplicationRunner {
         }
     }
 
-    // Provisorio: os textos definitivos entram na tarefa 13
+    // Conteudos dos arquivos em resources/conteudos; sem arquivo para o modulo, fica o provisorio
     private void criarConteudoProvisorio(Modulo modulo) {
+        cargaConteudo.carregarConteudos(modulo);
         if (conteudoRepository.existsByModulo(modulo)) {
             return;
         }
-        conteudoRepository.save(new Conteudo(modulo, "Conteúdo em construção",
+        conteudoRepository.save(new Conteudo(modulo, CargaConteudo.TITULO_PROVISORIO,
                 "<p>O conteúdo deste módulo será disponibilizado em breve.</p>", 1));
         log.info("Carga inicial: conteudo provisorio do modulo {} criado.", modulo.getOrdem());
     }

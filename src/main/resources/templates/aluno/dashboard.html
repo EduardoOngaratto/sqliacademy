@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Dashboard · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <h1 class="h3 mb-4" th:text="|Olá, ${usuario.nome}!|">Olá!</h1>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-body-secondary small">Pontuação</div>
+                    <div class="fs-3 fw-semibold" th:text="|${pontuacao} de ${pontuacaoMaxima}|">0 de 300</div>
+                    <div class="progress mt-2" role="progressbar" aria-label="Pontuação"
+                         th:attr="aria-valuenow=${pontuacao},aria-valuemax=${pontuacaoMaxima}" aria-valuemin="0">
+                        <div class="progress-bar"
+                             th:style="|width: ${pontuacaoMaxima > 0 ? pontuacao * 100 / pontuacaoMaxima : 0}%|"></div>
+                    </div>
+                    <div class="text-body-secondary small mt-1">100 pontos por laboratório resolvido</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-body-secondary small">Módulos concluídos</div>
+                    <div class="fs-3 fw-semibold" th:text="|${concluidos} de ${#lists.size(trilha)}|">0 de 3</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-body-secondary small">Laboratórios resolvidos</div>
+                    <div class="fs-3 fw-semibold" th:text="|${labsResolvidos} de ${#lists.size(trilha)}|">0 de 3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <a th:if="${proximo != null}" class="btn btn-primary"
+           th:href="@{/modulos/{id}(id=${proximo.modulo.id})}"
+           th:text="|Continuar: Módulo ${proximo.modulo.ordem} — ${proximo.modulo.titulo}|">Continuar</a>
+        <div th:if="${proximo == null and concluidos == #lists.size(trilha) and concluidos > 0}"
+             class="alert alert-success mb-0">
+            Parabéns! Você concluiu todos os módulos da trilha.
+        </div>
+    </div>
+
+    <h2 class="h5">Progresso por módulo</h2>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Módulo</th>
+                <th>Status</th>
+                <th>Conteúdos lidos</th>
+                <th>Laboratório</th>
+                <th class="text-end">Pontos</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${trilha}">
+                <td th:text="|${p.modulo.ordem}. ${p.modulo.titulo}|">Módulo</td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${p.status.name() == 'CONCLUIDO'} ? 'text-bg-success'
+                                        : (${p.status.name() == 'LIBERADO'} ? 'text-bg-primary' : 'text-bg-secondary')"
+                          th:text="${p.status.rotulo}">Status</span>
+                </td>
+                <td th:text="|${p.conteudosLidos} de ${p.totalConteudos}|">0 de 0</td>
+                <td th:text="${p.labResolvido} ? 'Resolvido' : 'Pendente'">Pendente</td>
+                <td class="text-end" th:text="${p.pontos}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

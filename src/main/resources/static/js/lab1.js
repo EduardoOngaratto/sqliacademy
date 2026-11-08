@@ -25,18 +25,4 @@
     usuario.addEventListener('input', atualizar);
     senha.addEventListener('input', atualizar);
     atualizar();
-
-    // Dicas progressivas: revela uma por clique
-    const botao = document.getElementById('botao-dica');
-    const dicas = document.querySelectorAll('[data-dica]');
-    let mostradas = 0;
-
-    botao.addEventListener('click', function () {
-        if (mostradas < dicas.length) {
-            dicas[mostradas].classList.remove('d-none');
-            mostradas++;
-        }
-        botao.textContent = 'Mostrar dica (' + mostradas + ' de ' + dicas.length + ')';
-        botao.disabled = mostradas === dicas.length;
-    });
 })();

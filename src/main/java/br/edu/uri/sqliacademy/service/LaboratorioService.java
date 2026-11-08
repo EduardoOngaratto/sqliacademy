@@ -61,6 +61,10 @@ public class LaboratorioService {
         return validadores.get(laboratorio.getCodigo()).getDicas();
     }
 
+    public Map<String, Object> modelo(Laboratorio laboratorio) {
+        return validadores.get(laboratorio.getCodigo()).getModelo();
+    }
+
     // So os campos esperados pelo lab (ignora _csrf e extras); campo ausente vira ""
     public Map<String, String> campos(Laboratorio laboratorio, Map<String, String> parametros) {
         Map<String, String> campos = new LinkedHashMap<>();

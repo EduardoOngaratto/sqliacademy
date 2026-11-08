@@ -18,4 +18,9 @@ public interface ValidadorLaboratorio {
     List<String> getDicas();
 
     ResultadoValidacao validar(Map<String, String> campos);
+
+    // Atributos extras para o template do lab (ex.: os trechos de codigo do Lab 2)
+    default Map<String, Object> getModelo() {
+        return Map.of();
+    }
 }

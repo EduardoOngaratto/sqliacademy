@@ -9,7 +9,9 @@ import br.edu.uri.sqliacademy.entity.Modulo;
 import br.edu.uri.sqliacademy.entity.Perfil;
 import br.edu.uri.sqliacademy.entity.TentativaLaboratorio;
 import br.edu.uri.sqliacademy.entity.Usuario;
+import br.edu.uri.sqliacademy.lab.DetalheCampo;
 import br.edu.uri.sqliacademy.lab.Lab1Validador;
+import br.edu.uri.sqliacademy.lab.Lab2Validador;
 import br.edu.uri.sqliacademy.lab.ResultadoValidacao;
 import br.edu.uri.sqliacademy.repository.LaboratorioRepository;
 import br.edu.uri.sqliacademy.repository.TentativaLaboratorioRepository;
@@ -51,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // Testes funcionais do Lab 1 (camada web + LaboratorioService e Lab1Validador reais, repositories simulados)
 @WebMvcTest(controllers = LaboratorioController.class)
-@Import({SecurityConfig.class, LaboratorioService.class, Lab1Validador.class})
+@Import({SecurityConfig.class, LaboratorioService.class, Lab1Validador.class, Lab2Validador.class})
 class LaboratorioTest {
 
     private static final String XSS = "<script>alert(1)</script>";
@@ -104,7 +106,7 @@ class LaboratorioTest {
 
     @Test
     void labSemValidadorOuInexistenteDa404() throws Exception {
-        mvc.perform(get("/laboratorios/LAB2").with(user("aluno@x.com").roles("ALUNO")))
+        mvc.perform(get("/laboratorios/LAB3").with(user("aluno@x.com").roles("ALUNO")))
                 .andExpect(status().isNotFound());
         mvc.perform(get("/laboratorios/XYZ").with(user("aluno@x.com").roles("ALUNO")))
                 .andExpect(status().isNotFound());
@@ -203,8 +205,66 @@ class LaboratorioTest {
     }
 
     @Test
+    void lab2MostraTrechosComLinhasClicaveisEscapadas() throws Exception {
+        usarLab2();
+
+        mvc.perform(get("/laboratorios/LAB2").with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Trecho 1 — Login")))
+                .andExpect(content().string(containsString("Trecho 4 — Pedidos por status")))
+                .andExpect(content().string(containsString("name=\"trecho1\" value=\"3\"")))
+                .andExpect(content().string(containsString("name=\"trecho4\" value=\"0\"")))
+                .andExpect(content().string(containsString("Nenhuma (código seguro)")))
+                // Codigo exibido com th:text (aspas escapadas)
+                .andExpect(content().string(containsString("request.getParameter(&quot;login&quot;)")))
+                .andExpect(content().string(containsString("Mostrar dica (0 de 3)")))
+                .andExpect(content().string(containsString("/js/lab2.js")))
+                .andExpect(content().string(containsString("/js/dicas.js")))
+                .andExpect(content().string(not(containsString("checked=\"checked\""))));
+    }
+
+    @Test
+    void lab2AcertoGravaTentativaComTodasAsRespostas() throws Exception {
+        usarLab2();
+
+        MvcResult result = mvc.perform(post("/laboratorios/LAB2")
+                        .param("trecho1", "3").param("trecho2", "0").param("trecho3", "2").param("trecho4", "0")
+                        .with(csrf()).with(user("aluno@x.com").roles("ALUNO")))
+                .andExpect(redirectedUrl("/laboratorios/LAB2"))
+                .andReturn();
+
+        assertTrue(((ResultadoValidacao) result.getFlashMap().get("resultado")).isSucesso());
+        ArgumentCaptor<TentativaLaboratorio> captor = ArgumentCaptor.forClass(TentativaLaboratorio.class);
+        verify(tentativaLaboratorioRepository).save(captor.capture());
+        assertTrue(captor.getValue().isSucesso());
+        assertEquals("trecho1: 3 | trecho2: 0 | trecho3: 2 | trecho4: 0", captor.getValue().getEntrada());
+    }
+
+    @Test
+    void lab2MantemEscolhasEMostraFeedbackPorTrecho() throws Exception {
+        usarLab2();
+        ResultadoValidacao erro = new ResultadoValidacao(false, null, "Você acertou 3 de 4 trechos.", List.of(),
+                Map.of("trecho1", new DetalheCampo(true, "Correto!"),
+                        "trecho3", new DetalheCampo(false, "Executar a consulta não é o problema")));
+
+        mvc.perform(get("/laboratorios/LAB2").with(user("aluno@x.com").roles("ALUNO"))
+                        .flashAttr("campos", Map.of("trecho1", "3", "trecho2", "0", "trecho3", "4", "trecho4", "0"))
+                        .flashAttr("resultado", erro))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Você acertou 3 de 4 trechos.")))
+                .andExpect(content().string(containsString("name=\"trecho3\" value=\"4\" checked=\"checked\"")))
+                .andExpect(content().string(containsString("Executar a consulta não é o problema")))
+                .andExpect(content().string(containsString("Correto!")));
+    }
+
+    @Test
     void labExigeLogin() throws Exception {
         mvc.perform(get("/laboratorios/LAB1")).andExpect(redirectedUrl("/login"));
+    }
+
+    private void usarLab2() {
+        Laboratorio lab2 = new Laboratorio(m1, "LAB2", "Encontre a linha vulnerável", "Enunciado do lab 2", null, 100);
+        when(laboratorioRepository.findByCodigo("LAB2")).thenReturn(Optional.of(lab2));
     }
 
     private ProgressoModulo progresso(int conteudosLidos, boolean labResolvido) {

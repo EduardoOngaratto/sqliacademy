@@ -47,6 +47,7 @@ public class LaboratorioController {
         model.addAttribute("progresso", progressoService.calcularModulo(usuario, laboratorio.getModulo()));
         model.addAttribute("dicas", laboratorioService.dicas(laboratorio));
         model.addAttribute("tamanhoMaximo", LaboratorioService.TAMANHO_MAXIMO);
+        model.addAllAttributes(laboratorioService.modelo(laboratorio));
         return "lab/" + laboratorio.getCodigo().toLowerCase(Locale.ROOT);
     }
 

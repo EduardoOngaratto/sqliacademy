@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="|${laboratorio.titulo} · SQLi Academy|">Laboratório · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <style>
+        .linha-codigo { display: flex; gap: .75rem; align-items: baseline; margin: 0; padding: .15rem .75rem; cursor: pointer; }
+        .linha-codigo:hover { background: var(--bs-tertiary-bg); }
+        .linha-codigo:has(input:checked) { background: var(--bs-warning-bg-subtle); box-shadow: inset 3px 0 var(--bs-warning); }
+        .linha-codigo:has(input:focus-visible) { outline: 2px solid var(--bs-primary); }
+        .linha-codigo .numero { min-width: 1.5rem; text-align: right; color: var(--bs-secondary-color); user-select: none; }
+        .linha-codigo code, .linha-codigo code.hljs { white-space: pre; background: transparent; padding: 0; }
+    </style>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/trilha}">Trilha</a></li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/modulos/{id}(id=${laboratorio.modulo.id})}" th:text="${laboratorio.modulo.titulo}">Módulo</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Laboratório</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center gap-2 mb-2">
+        <h1 class="h3 mb-0" th:text="|Laboratório: ${laboratorio.titulo}|">Laboratório</h1>
+        <span th:if="${progresso.labResolvido}" class="badge text-bg-success">Resolvido</span>
+    </div>
+    <p th:text="${laboratorio.enunciado}">Enunciado</p>
+
+    <div th:if="${progresso.conteudosLidos < progresso.totalConteudos}" class="alert alert-info">
+        Recomendamos ler os conteúdos do módulo antes do laboratório.
+    </div>
+
+    <div th:if="${resultado != null}" class="alert"
+         th:classappend="${resultado.sucesso} ? 'alert-success' : 'alert-warning'"
+         th:text="${resultado.feedback}">Feedback</div>
+
+    <form method="post" th:action="@{/laboratorios/{codigo}(codigo=${laboratorio.codigo})}">
+        <div th:each="trecho : ${trechos}" class="card mb-3"
+             th:with="escolha=${campos?.get(trecho.campo)},
+                      detalhe=${resultado != null ? resultado.detalhes.get(trecho.campo) : null}">
+            <div class="card-header" th:text="${trecho.titulo}">Trecho</div>
+            <!-- Cada linha e um radio: clicar na linha escolhe a resposta -->
+            <div class="card-body px-0 py-2 font-monospace small overflow-x-auto">
+                <label th:each="linha, it : ${trecho.linhas}" class="linha-codigo">
+                    <input type="radio" class="visually-hidden" required
+                           th:name="${trecho.campo}" th:value="${it.count}"
+                           th:checked="${escolha == #strings.toString(it.count)}">
+                    <span class="numero" th:text="${it.count}">1</span>
+                    <code class="language-java" th:text="${linha}">código</code>
+                </label>
+                <label class="linha-codigo border-top mt-2 pt-2">
+                    <input type="radio" class="visually-hidden" required
+                           th:name="${trecho.campo}" value="0" th:checked="${escolha == '0'}">
+                    <span class="numero">—</span>
+                    <span>Nenhuma (código seguro)</span>
+                </label>
+            </div>
+            <div th:if="${detalhe != null}" class="card-footer small"
+                 th:classappend="${detalhe.correto} ? 'text-success-emphasis bg-success-subtle' : 'text-warning-emphasis bg-warning-subtle'">
+                <span th:text="${detalhe.correto} ? '✓ ' : '✗ '"></span><span th:text="${detalhe.mensagem}">Mensagem</span>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar respostas</button>
+    </form>
+
+    <div class="mt-3">
+        <button type="button" id="botao-dica" class="btn btn-outline-secondary btn-sm"
+                th:text="|Mostrar dica (0 de ${#lists.size(dicas)})|">Mostrar dica</button>
+        <ol class="mt-2 ps-3">
+            <li th:each="dica : ${dicas}" class="d-none" data-dica th:text="${dica}">Dica</li>
+        </ol>
+    </div>
+
+    <section th:if="${progresso.labResolvido and laboratorio.explicacao != null}" class="card mt-4">
+        <div class="card-body">
+            <h2 class="h5 card-title">Entenda o que aconteceu</h2>
+            <!-- Texto da carga inicial (confiavel), nao vem do aluno -->
+            <div th:utext="${laboratorio.explicacao}"></div>
+        </div>
+    </section>
+
+    <div class="border-top pt-3 mt-4">
+        <a class="btn btn-outline-secondary" th:href="@{/modulos/{id}(id=${laboratorio.modulo.id})}">Voltar ao módulo</a>
+    </div>
+
+    <script th:src="@{/js/lab2.js}"></script>
+    <script th:src="@{/js/dicas.js}"></script>
+</main>
+</body>
+</html>

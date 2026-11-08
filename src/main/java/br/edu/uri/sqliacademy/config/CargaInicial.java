@@ -68,6 +68,32 @@ public class CargaInicial implements ApplicationRunner {
             (por exemplo, BCrypt) e conferir a senha no código.</p>
             """;
 
+    // Exibida ao resolver o Lab 2 (HTML confiavel, renderizado com th:utext)
+    private static final String EXPLICACAO_LAB2 = """
+            <h3 class="h6">Como identificar</h3>
+            <p>Siga o caminho da entrada do usuário. A falha está na linha em que ela é
+            <strong>concatenada no texto do SQL</strong>, e não onde o parâmetro é lido nem onde a consulta é executada.</p>
+            <ul>
+                <li><strong>Login:</strong> login e senha concatenados entre aspas (linha 3), o mesmo ataque do Lab 1.</li>
+                <li><strong>Filtro por id:</strong> a concatenação sem aspas (linha 2) também é vulnerável:
+                <code>1 OR 1=1</code> funciona sem fechar aspa nenhuma. Campo numérico não é sinônimo de seguro.</li>
+                <li><strong>Busca de produto:</strong> seguro. A concatenação <code>"%" + termo + "%"</code> monta só o
+                valor do parâmetro, que o PreparedStatement envia separado. Observação: <code>%</code> e <code>_</code>
+                digitados no termo funcionam como coringas do <code>LIKE</code> (buscar <code>%</code> traz todos os
+                produtos). Isso muda o resultado da busca, mas não é SQL Injection, porque a estrutura da consulta não
+                muda; se for um problema, esses caracteres podem ser escapados antes da busca.</li>
+                <li><strong>Pedidos por status:</strong> seguro. Até o valor lido direto da requisição vai por
+                <code>setString</code>, como dado.</li>
+            </ul>
+            <h3 class="h6">Impacto em um sistema real</h3>
+            <p>Uma única linha vulnerável basta para expor o banco inteiro: login burlado, pedidos de outros clientes,
+            dados alterados. Revisar o código procurando entrada concatenada em SQL é uma das formas mais baratas de
+            prevenção.</p>
+            <h3 class="h6">A regra prática</h3>
+            <p>Concatenar nem sempre é perigoso: o que importa é <em>o que</em> está sendo montado. Montar o texto do
+            SQL com entrada do usuário é vulnerável; montar o valor de um parâmetro do PreparedStatement não é.</p>
+            """;
+
     private final UsuarioRepository usuarioRepository;
     private final ModuloRepository moduloRepository;
     private final LaboratorioRepository laboratorioRepository;
@@ -112,8 +138,9 @@ public class CargaInicial implements ApplicationRunner {
         Modulo identificacao = criarModulo(2, "Identificação",
                 "Como reconhecer código vulnerável a SQL Injection.");
         criarLaboratorio(identificacao, "LAB2", "Encontre a linha vulnerável",
-                "Analise os trechos de código apresentados e aponte, em cada um, a linha que permite SQL Injection.",
-                null);
+                "Analise os trechos de código Java e clique, em cada um, na linha que permite SQL Injection. "
+                        + "Se o trecho for seguro, escolha \"Nenhuma\".",
+                EXPLICACAO_LAB2);
         criarConteudoProvisorio(identificacao);
 
         Modulo prevencao = criarModulo(3, "Prevenção",

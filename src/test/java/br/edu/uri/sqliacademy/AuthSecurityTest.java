@@ -82,7 +82,7 @@ class AuthSecurityTest {
     void adminSoParaPerfilAdmin() throws Exception {
         mvc.perform(get("/admin").with(user("aluno@x.com").roles("ALUNO"))).andExpect(status().isForbidden());
         mvc.perform(get("/admin/modulos").with(user("aluno@x.com").roles("ALUNO"))).andExpect(status().isForbidden());
-        // Admin passa pela seguranca; 404 porque ainda nao ha controller em /admin
+        // Admin passa pela seguranca; 404 porque o controller do admin nao faz parte deste teste
         mvc.perform(get("/admin").with(user("admin@x.com").roles("ADMIN"))).andExpect(status().isNotFound());
         mvc.perform(get("/admin")).andExpect(redirectedUrl("/login"));
     }

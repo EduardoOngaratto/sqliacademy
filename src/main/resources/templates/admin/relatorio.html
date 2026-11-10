@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Relatório · SQLi Academy</title>
+</head>
+<body>
+<main class="container py-4">
+    <h1 class="h3 mb-1">Relatório dos alunos</h1>
+    <p class="text-body-secondary" th:text="|${#lists.size(linhas)} aluno(s) cadastrado(s)|">0 alunos</p>
+
+    <div th:if="${#lists.isEmpty(linhas)}" class="alert alert-info">Nenhum aluno cadastrado ainda.</div>
+
+    <div th:unless="${#lists.isEmpty(linhas)}" class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Aluno</th>
+                <th th:each="m : ${modulos}" th:text="|${m.modulo.ordem}. ${m.modulo.titulo}|">Módulo</th>
+                <th>Labs resolvidos</th>
+                <th class="text-end">Pontuação</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="linha : ${linhas}">
+                <td>
+                    <div th:text="${linha.usuario.nome}">Nome</div>
+                    <div class="small text-body-secondary" th:text="${linha.usuario.email}">email</div>
+                    <span th:unless="${linha.usuario.ativo}" class="badge text-bg-warning">Inativo</span>
+                </td>
+                <td th:each="p : ${linha.trilha}">
+                    <span class="badge"
+                          th:classappend="${p.status.name() == 'CONCLUIDO'} ? 'text-bg-success'
+                                        : (${p.status.name() == 'LIBERADO'} ? 'text-bg-primary' : 'text-bg-secondary')"
+                          th:text="${p.status.rotulo}">Status</span>
+                    <div class="small mt-1" th:text="|Conteúdos: ${p.conteudosLidos} de ${p.totalConteudos}|"></div>
+                    <div class="small" th:text="${p.labResolvido} ? 'Lab: resolvido' : 'Lab: pendente'"></div>
+                </td>
+                <td th:text="|${linha.labsResolvidos} de ${#lists.size(linha.trilha)}|">0 de 3</td>
+                <td class="text-end" th:text="|${linha.pontuacao} de ${pontuacaoMaxima}|">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

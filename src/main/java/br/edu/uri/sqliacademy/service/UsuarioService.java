@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
@@ -26,6 +28,10 @@ public class UsuarioService {
     // Usuario logado: o "username" da autenticacao e o e-mail
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email).orElseThrow();
+    }
+
+    public List<Usuario> listarAlunos() {
+        return usuarioRepository.findByPerfilOrderByNomeAsc(Perfil.ALUNO);
     }
 
     // O e-mail ja chega normalizado pelo CadastroForm

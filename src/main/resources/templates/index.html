@@ -1,19 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
 <head>
     <title>SQLi Academy</title>
 </head>
 <body>
-<main class="container py-5">
-    <div class="p-5 bg-body-tertiary rounded-3">
-        <h1 class="display-5 fw-bold">SQLi Academy</h1>
-        <p class="col-lg-8 fs-5">
-            Aprenda o que é SQL Injection, como identificar código vulnerável e como se proteger,
-            com conteúdos, laboratórios práticos e questionários.
-        </p>
-        <a class="btn btn-primary btn-lg" th:href="@{/trilha}">Começar</a>
-    </div>
+<main>
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="hero-eyebrow"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i> Plataforma educacional</span>
+                    <h1 class="display-5 mt-3">Entenda o <span class="destaque">SQL Injection</span> na prática</h1>
+                    <p class="lead hero-lead mt-3">
+                        Textos curtos e laboratórios simulados para aprender como a falha acontece,
+                        como reconhecê-la no código e como corrigi-la.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-4" sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary btn-lg" th:href="@{/cadastro}">
+                            <i class="bi bi-person-plus me-2" aria-hidden="true"></i>Criar conta
+                        </a>
+                        <a class="btn btn-outline-light btn-lg" th:href="@{/login}">
+                            <i class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></i>Entrar
+                        </a>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-4" sec:authorize="isAuthenticated()">
+                        <a class="btn btn-primary btn-lg" th:href="@{/trilha}">
+                            <i class="bi bi-signpost-split me-2" aria-hidden="true"></i>Continuar na trilha
+                        </a>
+                        <a class="btn btn-outline-light btn-lg" th:href="@{/dashboard}">
+                            <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i>Meu progresso
+                        </a>
+                    </div>
+                    <p class="hero-nota small mt-4 mb-0">
+                        <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
+                        Ambiente 100% simulado: nada do que você digita é executado em um banco de dados.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="terminal" aria-hidden="true">
+                        <div class="terminal-barra">
+                            <span class="ponto"></span><span class="ponto"></span><span class="ponto"></span>
+                            <span class="ms-2">LoginServlet.java</span>
+                        </div>
+                        <pre class="nohighlight"><span class="t-comentario">// Vulnerável: a entrada vira parte do SQL</span>
+<span class="t-ruim">String sql = "SELECT * FROM usuario WHERE login = '" + login + "'";</span>
+
+<span class="t-comentario">// Seguro: a entrada vai separada, como parâmetro</span>
+<span class="t-bom">PreparedStatement ps = conexao.prepareStatement(
+        "SELECT * FROM usuario WHERE login = ?");
+ps.setString(1, login);</span></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="h3">Três módulos, três habilidades</h2>
+                <p class="text-body-secondary mb-0">
+                    Cada módulo tem um texto introdutório e um laboratório prático. Conclua um para liberar o próximo.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 card-lift">
+                        <div class="card-body p-4">
+                            <span class="icon-box icon-box-lg mb-3"><i class="bi bi-unlock" aria-hidden="true"></i></span>
+                            <div class="small text-body-secondary fw-semibold">Módulo 1 · Introdução</div>
+                            <h3 class="h4 mt-1">Atacar</h3>
+                            <p class="text-body-secondary mb-0">
+                                Entre em um login fictício sem saber a senha e veja a consulta SQL sendo alterada
+                                em tempo real.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-lift">
+                        <div class="card-body p-4">
+                            <span class="icon-box icon-box-lg mb-3"><i class="bi bi-search" aria-hidden="true"></i></span>
+                            <div class="small text-body-secondary fw-semibold">Módulo 2 · Identificação</div>
+                            <h3 class="h4 mt-1">Identificar</h3>
+                            <p class="text-body-secondary mb-0">
+                                Analise trechos de código Java e aponte a linha vulnerável, ou perceba quando o
+                                código já é seguro.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-lift">
+                        <div class="card-body p-4">
+                            <span class="icon-box icon-box-lg mb-3"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+                            <div class="small text-body-secondary fw-semibold">Módulo 3 · Prevenção</div>
+                            <h3 class="h4 mt-1">Corrigir</h3>
+                            <p class="text-body-secondary mb-0">
+                                Escolha, entre quatro correções, a que realmente protege, e veja o ataque falhar
+                                contra ela.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pb-5">
+        <div class="container">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="row g-4 text-center text-md-start">
+                        <div class="col-md-4 d-flex flex-column flex-md-row align-items-center align-items-md-start gap-3">
+                            <span class="icon-box icon-box-navy"><i class="bi bi-book" aria-hidden="true"></i></span>
+                            <div>
+                                <div class="passo-numero small">01</div>
+                                <div class="fw-semibold">Leia o texto introdutório</div>
+                                <div class="small text-body-secondary">Os conceitos essenciais de cada módulo.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column flex-md-row align-items-center align-items-md-start gap-3">
+                            <span class="icon-box icon-box-navy"><i class="bi bi-terminal" aria-hidden="true"></i></span>
+                            <div>
+                                <div class="passo-numero small">02</div>
+                                <div class="fw-semibold">Pratique no laboratório</div>
+                                <div class="small text-body-secondary">Com feedback e dicas a cada tentativa.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column flex-md-row align-items-center align-items-md-start gap-3">
+                            <span class="icon-box icon-box-navy"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
+                            <div>
+                                <div class="passo-numero small">03</div>
+                                <div class="fw-semibold">Acompanhe seu progresso</div>
+                                <div class="small text-body-secondary">100 pontos por laboratório resolvido.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 </body>
 </html>

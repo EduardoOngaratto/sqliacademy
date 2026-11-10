@@ -3,43 +3,71 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
-<nav th:fragment="navbar" class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-app" data-bs-theme="dark">
     <div class="container">
-        <a class="navbar-brand fw-bold" th:href="@{/}">SQLi Academy</a>
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+            <span class="brand-mark"><i class="bi bi-shield-lock-fill" aria-hidden="true"></i></span>
+            <span class="fw-bold">SQLi <span class="text-terminal">Academy</span></span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
                 aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menu">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="menuPrincipal">
             <ul class="navbar-nav me-auto" sec:authorize="isAuthenticated()">
-                <li class="nav-item"><a class="nav-link" th:href="@{/trilha}">Trilha</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}">Dashboard</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/trilha}"><i class="bi bi-signpost-split" aria-hidden="true"></i><span>Trilha</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
+                </li>
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                    <a class="nav-link" th:href="@{/admin}">Admin</a>
+                    <a class="nav-link" th:href="@{/admin}"><i class="bi bi-people" aria-hidden="true"></i><span>Admin</span></a>
                 </li>
             </ul>
             <!-- Logout do Spring Security e por POST (o th:action inclui o token CSRF).
                  Fica dentro de .navbar-nav para o botao herdar a cor dos links da navbar. -->
-            <ul class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
+            <ul class="navbar-nav ms-auto align-items-lg-center" sec:authorize="isAuthenticated()">
+                <li class="nav-item">
+                    <span class="navbar-text small me-lg-2 d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-person-circle" aria-hidden="true"></i><span sec:authentication="name">usuario</span>
+                    </span>
+                </li>
                 <li class="nav-item">
                     <form method="post" th:action="@{/logout}">
-                        <button type="submit" class="nav-link">Sair</button>
+                        <button type="submit" class="nav-link"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Sair</span></button>
                     </form>
                 </li>
             </ul>
-            <ul class="navbar-nav ms-auto" sec:authorize="!isAuthenticated()">
-                <li class="nav-item"><a class="nav-link" th:href="@{/login}">Entrar</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/cadastro}">Cadastrar</a></li>
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2" sec:authorize="!isAuthenticated()">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/login}"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Entrar</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary btn-sm px-3" th:href="@{/cadastro}"><span>Cadastrar</span></a>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<footer th:fragment="rodape" class="border-top bg-body-tertiary py-3">
-    <div class="container text-center text-body-secondary small">
-        SQLi Academy
+<footer th:fragment="rodape" class="footer-app py-4">
+    <div class="container d-flex align-items-center justify-content-center gap-2 small">
+        <i class="bi bi-shield-lock-fill text-terminal" aria-hidden="true"></i>
+        <span>SQLi Academy</span>
     </div>
 </footer>
+
+<!-- Badge de status do modulo, igual em todas as telas.
+     Uso: <span th:replace="~{layout/fragments :: status(${p.status})}"></span> -->
+<span th:fragment="status(statusModulo)" class="status"
+      th:classappend="${statusModulo.name() == 'CONCLUIDO'} ? 'status-concluido'
+                    : (${statusModulo.name() == 'LIBERADO'} ? 'status-liberado' : 'status-bloqueado')">
+    <i class="bi" aria-hidden="true"
+       th:classappend="${statusModulo.name() == 'CONCLUIDO'} ? 'bi-check-circle-fill'
+                     : (${statusModulo.name() == 'LIBERADO'} ? 'bi-unlock-fill' : 'bi-lock-fill')"></i><span
+        th:text="${statusModulo.rotulo}">Status</span>
+</span>
 
 </body>
 </html>

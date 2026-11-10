@@ -5,34 +5,47 @@
     <title>Trilha · SQLi Academy</title>
 </head>
 <body>
-<main class="container py-4">
-    <h1 class="h3 mb-4">Trilha de aprendizagem</h1>
+<main class="container py-4 py-md-5">
+    <div class="page-header">
+        <h1 class="h3 mb-1">Trilha de aprendizagem</h1>
+        <p class="page-subtitle">Leia o conteúdo e resolva o laboratório de cada módulo para liberar o próximo.</p>
+    </div>
 
-    <div th:if="${aviso}" class="alert alert-warning" th:text="${aviso}"></div>
+    <div th:if="${aviso}" class="alert alert-warning d-flex align-items-center gap-2">
+        <i class="bi bi-lock-fill" aria-hidden="true"></i><span th:text="${aviso}">Aviso</span>
+    </div>
 
-    <div class="row g-3">
-        <div class="col-12" th:each="p : ${trilha}">
-            <div class="card" th:classappend="${p.status.name() == 'BLOQUEADO'} ? 'opacity-75'">
-                <div class="card-body">
+    <div class="d-flex flex-column gap-3">
+        <div th:each="p : ${trilha}" class="card"
+             th:with="bloqueado=${p.status.name() == 'BLOQUEADO'}"
+             th:classappend="${bloqueado} ? 'modulo-bloqueado' : 'card-lift'">
+            <div class="card-body p-3 p-md-4 d-flex gap-3">
+                <span class="modulo-numero" th:text="${p.modulo.ordem}">1</span>
+                <div class="flex-grow-1 min-w-0">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                        <h2 class="h5 card-title mb-1"
-                            th:text="|Módulo ${p.modulo.ordem} — ${p.modulo.titulo}|">Módulo</h2>
-                        <span class="badge"
-                              th:classappend="${p.status.name() == 'CONCLUIDO'} ? 'text-bg-success'
-                                            : (${p.status.name() == 'LIBERADO'} ? 'text-bg-primary' : 'text-bg-secondary')"
-                              th:text="${p.status.rotulo}">Status</span>
+                        <h2 class="h5 mb-1" th:text="|Módulo ${p.modulo.ordem} — ${p.modulo.titulo}|">Módulo</h2>
+                        <span th:replace="~{layout/fragments :: status(${p.status})}"></span>
                     </div>
-                    <p class="card-text text-body-secondary" th:text="${p.modulo.descricao}"></p>
+                    <p class="text-body-secondary mb-3" th:text="${p.modulo.descricao}"></p>
 
-                    <ul class="list-unstyled small mb-3">
-                        <li th:text="|Conteúdos lidos: ${p.conteudosLidos} de ${p.totalConteudos}|"></li>
-                        <li th:text="|Laboratório: ${p.labResolvido ? 'resolvido' : 'pendente'}|"></li>
+                    <ul class="metricas mb-2">
+                        <li><i class="bi bi-book" aria-hidden="true"></i><span
+                                th:text="|Conteúdos lidos: ${p.conteudosLidos} de ${p.totalConteudos}|"></span></li>
+                        <li><i class="bi bi-terminal" aria-hidden="true"></i><span
+                                th:text="|Laboratório: ${p.labResolvido ? 'resolvido' : 'pendente'}|"></span></li>
                     </ul>
+                    <!-- Etapas do modulo: cada conteudo lido + o laboratorio -->
+                    <div class="progress mb-3" role="progressbar" aria-label="Progresso do módulo"
+                         th:with="feito=${p.conteudosLidos + (p.labResolvido ? 1 : 0)}, total=${p.totalConteudos + 1}">
+                        <div class="progress-bar" th:style="|width: ${feito * 100 / total}%|"></div>
+                    </div>
 
-                    <a th:if="${admin or p.status.name() != 'BLOQUEADO'}" class="btn btn-primary btn-sm"
-                       th:href="@{/modulos/{id}(id=${p.modulo.id})}">Acessar</a>
-                    <span th:unless="${admin or p.status.name() != 'BLOQUEADO'}" class="text-body-secondary small">
-                        Conclua o módulo anterior para liberar.
+                    <a th:if="${admin or !bloqueado}" class="btn btn-primary btn-sm"
+                       th:href="@{/modulos/{id}(id=${p.modulo.id})}">
+                        Acessar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+                    </a>
+                    <span th:unless="${admin or !bloqueado}" class="text-body-secondary small">
+                        <i class="bi bi-lock me-1" aria-hidden="true"></i>Conclua o módulo anterior para liberar.
                     </span>
                 </div>
             </div>

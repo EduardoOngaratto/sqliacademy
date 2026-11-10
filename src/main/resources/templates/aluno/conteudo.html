@@ -5,7 +5,7 @@
     <title th:text="|${conteudo.titulo} · SQLi Academy|">Conteúdo · SQLi Academy</title>
 </head>
 <body>
-<main class="container py-4">
+<main class="container py-4 py-md-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/trilha}">Trilha</a></li>
@@ -16,21 +16,30 @@
         </ol>
     </nav>
 
-    <div class="d-flex align-items-center gap-2 mb-3">
-        <h1 class="h3 mb-0" th:text="${conteudo.titulo}">Conteúdo</h1>
-        <span th:if="${concluido}" class="badge text-bg-success">Concluído</span>
-    </div>
+    <div class="card">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-4">
+                <h1 class="h3 mb-0" th:text="${conteudo.titulo}">Conteúdo</h1>
+                <span th:if="${concluido}" class="status status-concluido">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i><span>Concluído</span>
+                </span>
+            </div>
 
-    <!-- HTML cadastrado pelo admin (confiavel). Codigo em <pre><code class="language-sql|language-java"> -->
-    <article class="mb-4" th:utext="${conteudo.corpo}"></article>
-
-    <div class="d-flex flex-wrap gap-2 border-top pt-3">
-        <form method="post" th:action="@{/conteudos/{id}/concluir(id=${conteudo.id})}">
-            <button type="submit" class="btn btn-success" th:disabled="${concluido}"
-                    th:text="${concluido} ? 'Concluído ✓' : 'Marcar como concluído'">Marcar como concluído</button>
-        </form>
-        <a class="btn btn-outline-secondary" th:href="@{/modulos/{id}(id=${conteudo.modulo.id})}">Voltar ao módulo</a>
-        <a th:if="${proximo}" class="btn btn-primary" th:href="@{/conteudos/{id}(id=${proximo.id})}">Próximo conteúdo</a>
+            <!-- HTML da carga inicial (confiavel). Codigo em <pre><code class="language-sql|language-java"> -->
+            <article class="conteudo-texto" th:utext="${conteudo.corpo}"></article>
+        </div>
+        <div class="card-footer bg-transparent p-3 p-md-4 d-flex flex-wrap gap-2">
+            <form method="post" th:action="@{/conteudos/{id}/concluir(id=${conteudo.id})}">
+                <button type="submit" class="btn btn-primary" th:disabled="${concluido}"
+                        th:text="${concluido} ? 'Concluído ✓' : 'Marcar como concluído'">Marcar como concluído</button>
+            </form>
+            <a class="btn btn-outline-secondary" th:href="@{/modulos/{id}(id=${conteudo.modulo.id})}">
+                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Voltar ao módulo
+            </a>
+            <a th:if="${proximo}" class="btn btn-outline-primary ms-sm-auto" th:href="@{/conteudos/{id}(id=${proximo.id})}">
+                Próximo conteúdo <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </a>
+        </div>
     </div>
 </main>
 </body>

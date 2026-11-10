@@ -1,0 +1,496 @@
+/* SQLi Academy - identidade visual sobre o Bootstrap 5.3 (carregado depois dele no layout) */
+
+/* ---------- Paleta e tipografia ---------- */
+:root {
+    --app-navy: #0b1726;
+    --app-navy-2: #13253d;
+    --app-green: #047857;
+    --app-green-hover: #065f46;
+    --app-green-active: #064e3b;
+    --app-terminal: #34d399;
+    --app-border: #e3e8ef;
+
+    --bs-primary: #047857;
+    --bs-primary-rgb: 4, 120, 87;
+    --bs-primary-bg-subtle: #d1fae5;
+    --bs-primary-border-subtle: #a7f3d0;
+    --bs-primary-text-emphasis: #064e3b;
+    --bs-link-color: #047857;
+    --bs-link-color-rgb: 4, 120, 87;
+    --bs-link-hover-color: #065f46;
+    --bs-link-hover-color-rgb: 6, 95, 70;
+    --bs-focus-ring-color: rgba(4, 120, 87, .25);
+
+    --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --bs-font-monospace: "JetBrains Mono", SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    --bs-body-bg: #f5f7fa;
+    --bs-border-color: var(--app-border);
+    --bs-border-radius: .5rem;
+    --bs-border-radius-lg: .75rem;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+/* ---------- Botoes, formularios e progresso na cor principal ---------- */
+.btn {
+    font-weight: 500;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--app-green);
+    --bs-btn-border-color: var(--app-green);
+    --bs-btn-hover-bg: var(--app-green-hover);
+    --bs-btn-hover-border-color: var(--app-green-hover);
+    --bs-btn-active-bg: var(--app-green-active);
+    --bs-btn-active-border-color: var(--app-green-active);
+    --bs-btn-disabled-bg: var(--app-green);
+    --bs-btn-disabled-border-color: var(--app-green);
+    --bs-btn-focus-shadow-rgb: 4, 120, 87;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--app-green);
+    --bs-btn-border-color: var(--app-green);
+    --bs-btn-hover-bg: var(--app-green);
+    --bs-btn-hover-border-color: var(--app-green);
+    --bs-btn-active-bg: var(--app-green-hover);
+    --bs-btn-active-border-color: var(--app-green-hover);
+    --bs-btn-focus-shadow-rgb: 4, 120, 87;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--app-terminal);
+    box-shadow: 0 0 0 .25rem rgba(4, 120, 87, .18);
+}
+
+.form-check-input:checked {
+    background-color: var(--app-green);
+    border-color: var(--app-green);
+}
+
+.progress {
+    --bs-progress-bar-bg: var(--app-green);
+    --bs-progress-height: .5rem;
+}
+
+/* ---------- Navbar e rodape ---------- */
+.navbar-app {
+    background: var(--app-navy);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.navbar-app .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: .5rem;
+    background: rgba(52, 211, 153, .15);
+    color: var(--app-terminal);
+}
+
+.text-terminal {
+    color: var(--app-terminal);
+}
+
+.footer-app {
+    background: var(--app-navy);
+    color: rgba(230, 237, 246, .7);
+}
+
+/* ---------- Cabecalho das paginas ---------- */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.page-header .page-subtitle {
+    color: var(--bs-secondary-color);
+    margin-bottom: 0;
+}
+
+.breadcrumb {
+    font-size: .875rem;
+}
+
+/* ---------- Cards e icones ---------- */
+.card {
+    border-color: var(--app-border);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+}
+
+.card-header {
+    background: #fafbfc;
+    font-weight: 600;
+}
+
+.card-lift {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(16, 24, 40, .08);
+}
+
+.icon-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: .75rem;
+    font-size: 1.3rem;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--app-green);
+}
+
+.icon-box-lg {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.7rem;
+}
+
+.icon-box-navy {
+    background: #e2e8f0;
+    color: var(--app-navy-2);
+}
+
+.icon-box-alerta {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.modulo-numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--app-navy);
+    color: var(--app-terminal);
+}
+
+.modulo-bloqueado .modulo-numero {
+    background: #cbd5e1;
+    color: #475569;
+}
+
+.modulo-bloqueado {
+    background: #fafbfc;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+.metricas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.25rem;
+    padding: 0;
+    list-style: none;
+    font-size: .875rem;
+    color: var(--bs-secondary-color);
+}
+
+.metricas .bi {
+    margin-right: .3rem;
+}
+
+.stat-valor {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ---------- Badges de status (mesmas cores em todas as telas) ---------- */
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3em .75em;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-concluido {
+    background: #d1fae5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.status-liberado {
+    background: #dbeafe;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+.status-pendente {
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.status-bloqueado {
+    background: #eef1f5;
+    border-color: #dde2e9;
+    color: #4b5563;
+}
+
+/* ---------- Pagina inicial ---------- */
+.hero {
+    background:
+        radial-gradient(circle at 85% 20%, rgba(52, 211, 153, .14), transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(59, 130, 246, .12), transparent 40%),
+        var(--app-navy);
+    color: #e6edf6;
+    padding: 5rem 0;
+}
+
+.hero h1 {
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.hero .destaque {
+    color: var(--app-terminal);
+}
+
+.hero-lead {
+    color: rgba(230, 237, 246, .8);
+}
+
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .8rem;
+    border: 1px solid rgba(52, 211, 153, .35);
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--app-terminal);
+}
+
+.hero-nota {
+    color: rgba(230, 237, 246, .6);
+}
+
+.terminal {
+    background: #0a1220;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: .75rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .35);
+    overflow: hidden;
+}
+
+.terminal-barra {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .6rem .9rem;
+    background: rgba(255, 255, 255, .04);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    font-size: .75rem;
+    color: rgba(230, 237, 246, .5);
+}
+
+.terminal-barra .ponto {
+    width: .65rem;
+    height: .65rem;
+    border-radius: 50%;
+    background: #334155;
+}
+
+.terminal pre {
+    margin: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 1.1rem 1.2rem;
+    color: #e6edf6;
+    font-size: .82rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal .t-comentario {
+    color: #7d8ba1;
+}
+
+.terminal .t-ruim {
+    color: #fca5a5;
+}
+
+.terminal .t-bom {
+    color: var(--app-terminal);
+}
+
+.passo-numero {
+    font-family: var(--bs-font-monospace);
+    font-weight: 600;
+    color: var(--app-green);
+}
+
+/* ---------- Login e cadastro ---------- */
+.auth-wrapper {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 12rem);
+    padding: 2.5rem 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+/* ---------- Texto dos conteudos ---------- */
+.conteudo-texto {
+    max-width: 72ch;
+    font-size: 1.05rem;
+    line-height: 1.75;
+}
+
+.conteudo-texto h2 {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+    margin-bottom: .75rem;
+}
+
+.conteudo-texto h2:first-child {
+    margin-top: 0;
+}
+
+/* ---------- Blocos de codigo (highlight.js) ---------- */
+pre {
+    background: #f6f8fa;
+    border: 1px solid var(--app-border);
+    border-radius: .5rem;
+    padding: 1rem;
+    font-size: .85rem;
+}
+
+pre code.hljs {
+    padding: 0;
+    background: transparent;
+}
+
+/* ---------- Laboratorios ---------- */
+.query-box {
+    background: var(--app-navy);
+    border: 0;
+    color: #e6edf6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: .875rem;
+}
+
+.query-box mark {
+    background: #fbbf24;
+    color: #111827;
+    padding: 0 .15em;
+    border-radius: .2rem;
+}
+
+.dicas li {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: .5rem;
+    padding: .6rem .8rem;
+    margin-bottom: .5rem;
+}
+
+/* Lab 2: cada linha de codigo e um radio clicavel */
+.linha-codigo {
+    display: flex;
+    gap: .75rem;
+    align-items: baseline;
+    margin: 0;
+    padding: .2rem .75rem;
+    cursor: pointer;
+}
+
+.linha-codigo:hover {
+    background: var(--bs-tertiary-bg);
+}
+
+.linha-codigo:has(input:checked) {
+    background: #fef3c7;
+    box-shadow: inset 3px 0 #f59e0b;
+}
+
+.linha-codigo:has(input:focus-visible) {
+    outline: 2px solid var(--app-green);
+}
+
+.linha-codigo .numero {
+    min-width: 1.5rem;
+    text-align: right;
+    color: var(--bs-secondary-color);
+    user-select: none;
+}
+
+.linha-codigo code,
+.linha-codigo code.hljs {
+    white-space: pre;
+    background: transparent;
+    padding: 0;
+}
+
+/* Lab 3: card inteiro clicavel */
+.versao:has(input:checked) {
+    border-color: var(--app-green);
+    box-shadow: 0 0 0 .2rem rgba(4, 120, 87, .2);
+}
+
+.versao:has(input:focus-visible) {
+    outline: 2px solid var(--app-green);
+}
+
+.versao pre {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 575.98px) {
+    .hero {
+        padding: 3rem 0;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .stat-valor {
+        font-size: 1.5rem;
+    }
+
+    .conteudo-texto {
+        font-size: 1rem;
+    }
+}

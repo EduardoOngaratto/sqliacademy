@@ -1,9 +1,24 @@
 <h1>Identificação de código vulnerável</h1>
-<!-- O <h1> acima é o título do conteúdo (aparece no topo da página e na lista do módulo). -->
-<!-- Blocos de código: <pre><code class="language-sql">...</code></pre> ou class="language-java", com < > & escapados. -->
 
 <h2>Pontos de entrada</h2>
-<!-- TEXTO: os pontos de entrada de dados de uma aplicação. -->
+<p>Ponto de entrada é qualquer lugar por onde um dado vindo de fora chega à aplicação. Os mais evidentes são os campos
+de formulário: login, cadastro, busca, comentários. Mas eles não são os únicos.</p>
+<p>Parâmetros na URL (como em <code>/livros?categoria=romance&amp;pagina=2</code>), filtros e opções de ordenação de
+listas, menus de seleção e campos ocultos também vêm do navegador e podem ser alterados pelo usuário, seja pelas
+ferramentas do navegador, seja montando a requisição manualmente. O mesmo vale para cookies e cabeçalhos HTTP.</p>
+<p>A regra prática é tratar todo dado que vem da requisição como não confiável, mesmo que ele tenha saído de um menu
+com opções fixas ou de um campo que o usuário nem vê na tela.</p>
 
 <h2>Sinais de código vulnerável</h2>
-<!-- TEXTO: os sinais de código vulnerável. -->
+<p>O principal sinal é a entrada do usuário sendo <strong>concatenada no texto de um comando SQL</strong>, com o
+operador <code>+</code>, <code>concat</code> ou <code>StringBuilder.append</code>, e esse texto sendo executado depois.
+Costuma vir acompanhado do uso de <code>Statement</code>, que executa o texto exatamente como foi montado:</p>
+<pre><code class="language-java">String editora = request.getParameter("editora");
+String sql = "SELECT titulo, ano FROM livro WHERE editora = '" + editora + "'";
+Statement st = conexao.createStatement();
+ResultSet rs = st.executeQuery(sql);</code></pre>
+<p>Para analisar um trecho, siga o caminho do dado: de onde ele vem (o ponto de entrada), por onde passa e como chega
+ao SQL. Se em algum momento ele vira parte do texto do comando, há risco de SQL Injection.</p>
+<p>Atenção: nem sempre a montagem da consulta fica perto do ponto de entrada. O valor pode ser lido em um método e
+usado para montar o SQL em outro, ou ser guardado e usado mais tarde. Por isso é importante acompanhar o dado até o
+fim, e não olhar só a linha em que a consulta é executada.</p>

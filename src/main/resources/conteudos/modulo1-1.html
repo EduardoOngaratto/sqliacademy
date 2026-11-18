@@ -1,15 +1,39 @@
 <h1>Introdução ao SQL Injection</h1>
-<!-- O <h1> acima é o título do conteúdo (aparece no topo da página e na lista do módulo). -->
-<!-- Blocos de código: <pre><code class="language-sql">...</code></pre> ou class="language-java", com < > & escapados. -->
 
 <h2>O que é</h2>
-<!-- TEXTO: o que é SQL Injection. -->
+<p>SQL Injection é uma vulnerabilidade em que dados fornecidos pelo usuário acabam sendo interpretados pelo banco
+de dados como parte de um comando SQL. Em vez de serem tratados apenas como um valor a ser procurado ou gravado,
+esses dados passam a alterar a própria consulta.</p>
+<p>A falha não está no banco de dados nem na linguagem SQL, e sim na forma como a aplicação monta a consulta. Quando
+o programa junta, em um único texto, o código SQL escrito pelo programador e o valor digitado pelo usuário, o banco
+recebe tudo misturado e não tem como saber onde termina o comando e onde começa o dado.</p>
 
 <h2>Por que acontece</h2>
-<!-- TEXTO: por que a falha acontece. -->
+<p>Imagine o sistema de uma biblioteca que busca livros pelo nome do autor e monta a consulta concatenando o valor
+digitado:</p>
+<pre><code class="language-java">String sql = "SELECT titulo, ano FROM livro WHERE autor = '" + autor + "'";</code></pre>
+<p>Com o valor <code>Machado de Assis</code>, a consulta funciona normalmente. Mas, ao buscar a autora
+<code>D'Ávila</code>, o texto montado fica assim:</p>
+<pre><code class="language-sql">SELECT titulo, ano FROM livro WHERE autor = 'D'Ávila'</code></pre>
+<p>O apóstrofo do nome fecha o texto antes da hora, e o que sobra (<code>Ávila'</code>) deixa a consulta com erro de
+sintaxe. Ninguém atacou o sistema: um valor legítimo mudou a estrutura do comando. Se um valor inocente consegue
+quebrar a consulta, um valor escrito de propósito consegue alterá-la de forma calculada. Esse é o problema central do
+SQL Injection: código e dados misturados no mesmo texto.</p>
 
 <h2>Impacto</h2>
-<!-- TEXTO: o impacto em um sistema real. -->
+<p>Como o atacante passa a escrever uma parte do comando, o estrago depende do que o banco permite à aplicação. Em
+geral, ele pode ler dados que não deveria (dados pessoais, senhas, informações financeiras), burlar a autenticação e
+alterar ou apagar registros.</p>
+<p>As consequências vão além da parte técnica: vazamento de dados de clientes, prejuízo financeiro, danos à reputação
+da empresa e responsabilização legal. No Brasil, a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018) prevê
+sanções para incidentes de segurança que envolvam dados pessoais.</p>
 
 <h2>Relevância</h2>
-<!-- TEXTO: a relevância do tema. -->
+<p>O SQL Injection é conhecido desde o fim da década de 1990 e continua presente em aplicações reais. O OWASP Top 10,
+principal referência sobre riscos de segurança em aplicações web, inclui na edição de 2025 a categoria
+<strong>A05:2025 – Injection</strong>, que reúne as falhas de injeção, entre elas o SQL Injection. No catálogo CWE,
+mantido pelo MITRE, essa falha é a <strong>CWE-89</strong> (<em>Improper Neutralization of Special Elements used in an
+SQL Command</em>).</p>
+<p>Ele persiste porque é fácil de introduzir: basta concatenar uma entrada em uma consulta. A boa notícia é que também
+é fácil de prevenir com técnicas bem conhecidas. Os próximos módulos mostram como reconhecer o código vulnerável e
+como corrigi-lo.</p>

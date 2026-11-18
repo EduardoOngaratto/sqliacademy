@@ -1,12 +1,43 @@
 <h1>Prevenção de SQL Injection</h1>
-<!-- O <h1> acima é o título do conteúdo (aparece no topo da página e na lista do módulo). -->
-<!-- Blocos de código: <pre><code class="language-sql">...</code></pre> ou class="language-java", com < > & escapados. -->
 
 <h2>Consultas parametrizadas</h2>
-<!-- TEXTO: consultas parametrizadas (PreparedStatement). -->
+<p>A forma correta de evitar SQL Injection é não misturar código e dados. Em Java, com JDBC, isso é feito com
+<code>PreparedStatement</code>: a consulta é escrita com marcadores <code>?</code> no lugar dos valores, e os valores
+são informados depois, por métodos como <code>setString</code> e <code>setInt</code>.</p>
+<pre><code class="language-java">String sql = "SELECT titulo, ano FROM livro WHERE autor = ?";
+PreparedStatement ps = conexao.prepareStatement(sql);
+ps.setString(1, autor);
+ResultSet rs = ps.executeQuery();</code></pre>
+<p>O texto do SQL chega ao banco sem nenhum dado do usuário, e o valor é enviado separado. Como o banco já conhece a
+estrutura do comando antes de receber o valor, este é tratado sempre como dado: buscar a autora <code>D'Ávila</code>
+funciona normalmente, e o apóstrofo é só mais um caractere do nome.</p>
+<p>Os marcadores substituem apenas valores, e não partes da estrutura da consulta, como nomes de tabelas e colunas ou a
+direção de um <code>ORDER BY</code>. Quando essas partes precisam variar, a aplicação deve escolher entre opções fixas
+definidas no próprio código (uma lista de valores permitidos), nunca concatenando o que veio da requisição.</p>
 
 <h2>ORM</h2>
-<!-- TEXTO: uso de ORM (JPA/Hibernate). -->
+<p>Frameworks ORM, como o JPA/Hibernate, mapeiam tabelas para classes Java e geram o SQL automaticamente. Os métodos
+de repositório do Spring Data (como <code>findByAutor</code>) e as consultas JPQL com parâmetros nomeados são
+parametrizados por padrão. Esta plataforma, por exemplo, acessa o banco só dessa forma.</p>
+<pre><code class="language-java">@Query("SELECT l FROM Livro l WHERE l.autor = :autor")
+List&lt;Livro&gt; buscarPorAutor(@Param("autor") String autor);</code></pre>
+<p>O ORM, porém, não protege de tudo. Uma consulta JPQL ou SQL nativa montada por concatenação volta a ter o mesmo
+problema, porque o texto da consulta passa a conter o dado do usuário:</p>
+<pre><code class="language-java">// Vulnerável: a entrada vira parte do texto do JPQL
+em.createQuery("SELECT l FROM Livro l WHERE l.autor = '" + autor + "'", Livro.class);
+
+// Seguro: o valor vai como parâmetro nomeado
+em.createQuery("SELECT l FROM Livro l WHERE l.autor = :autor", Livro.class)
+        .setParameter("autor", autor);</code></pre>
+<p>A regra vale com ou sem ORM: o valor vindo do usuário entra sempre como parâmetro.</p>
 
 <h2>Boas práticas complementares</h2>
-<!-- TEXTO: boas práticas complementares. -->
+<p><strong>Validação no servidor.</strong> Conferir tipo, tamanho e formato das entradas (um ano deve ser um número
+dentro de uma faixa válida, um e-mail deve ter formato de e-mail) reduz erros e limita o que um atacante consegue
+enviar. A validação é um complemento das consultas parametrizadas, e não um substituto.</p>
+<p><strong>Menor privilégio no banco.</strong> O usuário de banco usado pela aplicação deve ter apenas as permissões de
+que precisa: por exemplo, sem permissão para apagar tabelas ou acessar outros bancos. Se alguma falha passar, o
+estrago fica limitado.</p>
+<p><strong>Mensagens de erro genéricas.</strong> Detalhes de erros do banco, como mensagens de sintaxe, nomes de
+tabelas ou o rastreamento da exceção, não devem ser exibidos ao usuário. Eles ajudam o atacante a entender como a
+consulta foi montada. O correto é registrar o detalhe no log do servidor e mostrar uma mensagem genérica.</p>

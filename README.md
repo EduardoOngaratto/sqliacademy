@@ -3,7 +3,7 @@
 Plataforma web educacional sobre **SQL Injection**, desenvolvida como Trabalho de Conclusão de Curso de Ciência da Computação na URI Erechim.
 
 - **Autor:** Eduardo Ongaratto
-- **Orientador:** Prof. Fabio Zanin
+- **Orientador:** Prof. Malomar Alex Seminotti
 
 O aluno segue uma trilha de 3 módulos. Cada módulo tem um texto introdutório e um laboratório prático, e o módulo seguinte só é liberado quando o anterior é concluído.
 
